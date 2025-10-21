@@ -5,7 +5,7 @@ import Home from './pages/Home.jsx';
 import AboutUs from './pages/AboutUs.jsx';
 import ContactUs from './pages/ContactUs.jsx';
 import Scan from './components/Scan.jsx';
-import Login from './components/login.jsx'; // ✅ FIXED CASE
+import Login from './components/Login.jsx'; // ✅ FIXED CASE
 import SignIn from './components/SignIn.jsx';
 import PrivateRoute from './components/PrivateRoute.jsx';
 import Dashboard from './components/DashBoard.jsx';
