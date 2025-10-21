@@ -3,68 +3,100 @@
 export const calculateNutritionScore = (nutrients) => {
   let score = 0;
 
-  // Negative points
-  if (nutrients.energy > 3350) score += 10;
-  else if (nutrients.energy > 3015) score += 9;
-  else if (nutrients.energy > 2680) score += 8;
-  else if (nutrients.energy > 2345) score += 7;
-  else if (nutrients.energy > 2010) score += 6;
-  else if (nutrients.energy > 1675) score += 5;
-  else if (nutrients.energy > 1340) score += 4;
-  else if (nutrients.energy > 1005) score += 3;
-  else if (nutrients.energy > 670) score += 2;
-  else if (nutrients.energy > 335) score += 1;
+  // 🔴 Negative Points
+  score += getEnergyPoints(nutrients.energy);
+  score += getSugarPoints(nutrients.sugars);
+  score += getSaturatedFatPoints(nutrients.saturatedFat);
+  score += getSodiumPoints(nutrients.sodium);
 
-  if (nutrients.sugars > 45) score += 10;
-  else if (nutrients.sugars > 40) score += 9;
-  else if (nutrients.sugars > 36) score += 8;
-  else if (nutrients.sugars > 31) score += 7;
-  else if (nutrients.sugars > 27) score += 6;
-  else if (nutrients.sugars > 22.5) score += 5;
-  else if (nutrients.sugars > 18) score += 4;
-  else if (nutrients.sugars > 13.5) score += 3;
-  else if (nutrients.sugars > 9) score += 2;
-  else if (nutrients.sugars > 4.5) score += 1;
+  // 🟢 Positive Points
+  score -= getFiberPoints(nutrients.fiber);
+  score -= getProteinPoints(nutrients.protein);
 
-  if (nutrients.saturatedFat > 10) score += 10;
-  else if (nutrients.saturatedFat > 9) score += 9;
-  else if (nutrients.saturatedFat > 8) score += 8;
-  else if (nutrients.saturatedFat > 7) score += 7;
-  else if (nutrients.saturatedFat > 6) score += 6;
-  else if (nutrients.saturatedFat > 5) score += 5;
-  else if (nutrients.saturatedFat > 4) score += 4;
-  else if (nutrients.saturatedFat > 3) score += 3;
-  else if (nutrients.saturatedFat > 2) score += 2;
-  else if (nutrients.saturatedFat > 1) score += 1;
-
-  if (nutrients.sodium > 900) score += 10;
-  else if (nutrients.sodium > 810) score += 9;
-  else if (nutrients.sodium > 720) score += 8;
-  else if (nutrients.sodium > 630) score += 7;
-  else if (nutrients.sodium > 540) score += 6;
-  else if (nutrients.sodium > 450) score += 5;
-  else if (nutrients.sodium > 360) score += 4;
-  else if (nutrients.sodium > 270) score += 3;
-  else if (nutrients.sodium > 180) score += 2;
-  else if (nutrients.sodium > 90) score += 1;
-
-  // Positive points
-  if (nutrients.fiber > 4.7) score -= 5;
-  else if (nutrients.fiber > 3.7) score -= 4;
-  else if (nutrients.fiber > 2.8) score -= 3;
-  else if (nutrients.fiber > 1.9) score -= 2;
-  else if (nutrients.fiber > 0.9) score -= 1;
-
-  if (nutrients.protein > 8.0) score -= 5;
-  else if (nutrients.protein > 6.4) score -= 4;
-  else if (nutrients.protein > 4.8) score -= 3;
-  else if (nutrients.protein > 3.2) score -= 2;
-  else if (nutrients.protein > 1.6) score -= 1;
-
-  // Final grade
+  // 🏅 Final Grade
   if (score <= 0) return "A";
   if (score <= 2) return "B";
   if (score <= 10) return "C";
   if (score <= 18) return "D";
   return "E";
 };
+
+// 🔴 Energy Points
+function getEnergyPoints(val) {
+  if (val > 3350) return 10;
+  if (val > 3015) return 9;
+  if (val > 2680) return 8;
+  if (val > 2345) return 7;
+  if (val > 2010) return 6;
+  if (val > 1675) return 5;
+  if (val > 1340) return 4;
+  if (val > 1005) return 3;
+  if (val > 670) return 2;
+  if (val > 335) return 1;
+  return 0;
+}
+
+// 🔴 Sugar Points
+function getSugarPoints(val) {
+  if (val > 45) return 10;
+  if (val > 40) return 9;
+  if (val > 36) return 8;
+  if (val > 31) return 7;
+  if (val > 27) return 6;
+  if (val > 22.5) return 5;
+  if (val > 18) return 4;
+  if (val > 13.5) return 3;
+  if (val > 9) return 2;
+  if (val > 4.5) return 1;
+  return 0;
+}
+
+// 🔴 Saturated Fat Points
+function getSaturatedFatPoints(val) {
+  if (val > 10) return 10;
+  if (val > 9) return 9;
+  if (val > 8) return 8;
+  if (val > 7) return 7;
+  if (val > 6) return 6;
+  if (val > 5) return 5;
+  if (val > 4) return 4;
+  if (val > 3) return 3;
+  if (val > 2) return 2;
+  if (val > 1) return 1;
+  return 0;
+}
+
+// 🔴 Sodium Points
+function getSodiumPoints(val) {
+  if (val > 900) return 10;
+  if (val > 810) return 9;
+  if (val > 720) return 8;
+  if (val > 630) return 7;
+  if (val > 540) return 6;
+  if (val > 450) return 5;
+  if (val > 360) return 4;
+  if (val > 270) return 3;
+  if (val > 180) return 2;
+  if (val > 90) return 1;
+  return 0;
+}
+
+// 🟢 Fiber Points
+function getFiberPoints(val) {
+  if (val > 4.7) return 5;
+  if (val > 3.7) return 4;
+  if (val > 2.8) return 3;
+  if (val > 1.9) return 2;
+  if (val > 0.9) return 1;
+  return 0;
+}
+
+// 🟢 Protein Points
+function getProteinPoints(val) {
+  if (val > 8.0) return 5;
+  if (val > 6.4) return 4;
+  if (val > 4.8) return 3;
+  if (val > 3.2) return 2;
+  if (val > 1.6) return 1;
+  return 0;
+}
