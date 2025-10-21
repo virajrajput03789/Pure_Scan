@@ -13,7 +13,7 @@ const AboutUs = () => {
           </h1>
 
           <p className="text-gray-700 leading-relaxed">
-            Smart Food Analyzer is inspired by the Yuka app and built to help
+            Smart Food Analyzer is built to help
             people make better food choices. It scans food items, evaluates
             their nutritional quality, and helps users stay aware of what they
             consume daily.
