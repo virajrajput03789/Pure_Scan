@@ -33,36 +33,51 @@ const Dashboard = () => {
   const best = history.reduce((a, b) => (a.nutritionScore > b.nutritionScore ? a : b), history[0]);
   const worst = history.reduce((a, b) => (a.nutritionScore < b.nutritionScore ? a : b), history[0]);
 
+  // ✅ Helper for score color
+  const getScoreColor = (score) => {
+    if (score <= 0) return "text-green-600";
+    if (score <= 5) return "text-yellow-600";
+    return "text-red-600";
+  };
+
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-4 text-green-700">Your Scan History</h2>
+    <div className="max-w-4xl mx-auto p-6">
+      <h2 className="text-3xl font-bold mb-6 text-green-700">📊 Your Scan History</h2>
 
       {/* ✅ Analytics Summary */}
       {history.length > 0 && (
-        <div className="mb-6 text-sm text-gray-700 space-y-1">
+        <div className="mb-8 text-sm text-gray-700 space-y-2 bg-gray-50 p-4 rounded shadow-sm">
           <p><strong>Total Scans:</strong> {totalScans}</p>
-          <p><strong>Average Nutrition Score:</strong> {avgScore}</p>
-          <p><strong>Best Product:</strong> {best?.productName} ({best?.nutritionScore})</p>
-          <p><strong>Worst Product:</strong> {worst?.productName} ({worst?.nutritionScore})</p>
+          <p><strong>Average Nutrition Score:</strong> <span className={getScoreColor(avgScore)}>{avgScore}</span></p>
+          <p><strong>Best Product:</strong> {best?.productName} (<span className={getScoreColor(best?.nutritionScore)}>{best?.nutritionScore}</span>)</p>
+          <p><strong>Worst Product:</strong> {worst?.productName} (<span className={getScoreColor(worst?.nutritionScore)}>{worst?.nutritionScore}</span>)</p>
         </div>
       )}
 
+      {/* ✅ Scan List */}
       {history.length === 0 ? (
-        <p className="text-gray-600">No scans yet. Start scanning to see results here!</p>
+        <p className="text-gray-600 text-center mt-12">No scans yet. Start scanning to see results here!</p>
       ) : (
         <ul className="space-y-4">
           {history.map((item) => (
-            <li key={item.id} className="border p-4 rounded shadow-sm bg-white">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-semibold text-lg">{item.productName}</p>
-                  <p className="text-sm text-gray-500">Barcode: {item.barcode}</p>
-                  <p className="text-sm text-gray-500">Nutrition Score: {item.nutritionScore}</p>
-                </div>
-                <span className="text-xs text-gray-400">
-                  {new Date(item.timestamp?.toDate()).toLocaleString()}
-                </span>
+            <li key={item.id} className="border p-4 rounded shadow-sm bg-white flex gap-4 items-center">
+              {item.image && (
+                <img
+                  src={item.image}
+                  alt={item.productName}
+                  className="w-16 h-16 object-cover rounded"
+                />
+              )}
+              <div className="flex-1">
+                <p className="font-semibold text-lg">{item.productName}</p>
+                <p className="text-sm text-gray-500">Barcode: {item.barcode}</p>
+                <p className={`text-sm ${getScoreColor(item.nutritionScore)}`}>
+                  Nutrition Score: {item.nutritionScore}
+                </p>
               </div>
+              <span className="text-xs text-gray-400">
+                {new Date(item.timestamp?.toDate()).toLocaleString()}
+              </span>
             </li>
           ))}
         </ul>

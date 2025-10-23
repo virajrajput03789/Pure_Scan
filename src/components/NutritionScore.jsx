@@ -1,28 +1,59 @@
-// src/utils/calculateNutritionScore.js
+// src/utils/NutritionScore.js
 
-export const calculateNutritionScore = (nutrients) => {
-  let score = 0;
+export const NutritionScore = (nutrients) => {
+  const {
+    energy = 0,
+    sugars = 0,
+    saturatedFat = 0,
+    sodium = 0,
+    fiber = 0,
+    protein = 0,
+  } = nutrients;
 
   // 🔴 Negative Points
-  score += getEnergyPoints(nutrients.energy);
-  score += getSugarPoints(nutrients.sugars);
-  score += getSaturatedFatPoints(nutrients.saturatedFat);
-  score += getSodiumPoints(nutrients.sodium);
+  const energyPoints = getEnergyPoints(energy);
+  const sugarPoints = getSugarPoints(sugars);
+  const satFatPoints = getSaturatedFatPoints(saturatedFat);
+  const sodiumPoints = getSodiumPoints(sodium);
 
   // 🟢 Positive Points
-  score -= getFiberPoints(nutrients.fiber);
-  score -= getProteinPoints(nutrients.protein);
+  const fiberPoints = getFiberPoints(fiber);
+  const proteinPoints = getProteinPoints(protein);
 
-  // 🏅 Final Grade
-  if (score <= 0) return "A";
-  if (score <= 2) return "B";
-  if (score <= 10) return "C";
-  if (score <= 18) return "D";
-  return "E";
+  // 🧮 Final Score Calculation
+  const score =
+    energyPoints +
+    sugarPoints +
+    satFatPoints +
+    sodiumPoints -
+    fiberPoints -
+    proteinPoints;
+
+  // 🏅 Grade Mapping
+  let grade = "E";
+  if (score <= 0) grade = "A";
+  else if (score <= 2) grade = "B";
+  else if (score <= 10) grade = "C";
+  else if (score <= 18) grade = "D";
+
+  // ✅ Return full breakdown for UI/dashboard
+  return {
+    grade,
+    rawScore: score,
+    breakdown: {
+      energy: energyPoints,
+      sugars: sugarPoints,
+      saturatedFat: satFatPoints,
+      sodium: sodiumPoints,
+      fiber: fiberPoints,
+      protein: proteinPoints,
+    },
+  };
 };
 
 // 🔴 Energy Points
-function getEnergyPoints(val) {
+function getEnergyPoints(val = 0) {
+  val = Math.round(val);
   if (val > 3350) return 10;
   if (val > 3015) return 9;
   if (val > 2680) return 8;
@@ -37,7 +68,8 @@ function getEnergyPoints(val) {
 }
 
 // 🔴 Sugar Points
-function getSugarPoints(val) {
+function getSugarPoints(val = 0) {
+  val = Math.round(val);
   if (val > 45) return 10;
   if (val > 40) return 9;
   if (val > 36) return 8;
@@ -52,7 +84,8 @@ function getSugarPoints(val) {
 }
 
 // 🔴 Saturated Fat Points
-function getSaturatedFatPoints(val) {
+function getSaturatedFatPoints(val = 0) {
+  val = Math.round(val);
   if (val > 10) return 10;
   if (val > 9) return 9;
   if (val > 8) return 8;
@@ -67,7 +100,8 @@ function getSaturatedFatPoints(val) {
 }
 
 // 🔴 Sodium Points
-function getSodiumPoints(val) {
+function getSodiumPoints(val = 0) {
+  val = Math.round(val);
   if (val > 900) return 10;
   if (val > 810) return 9;
   if (val > 720) return 8;
@@ -82,7 +116,8 @@ function getSodiumPoints(val) {
 }
 
 // 🟢 Fiber Points
-function getFiberPoints(val) {
+function getFiberPoints(val = 0) {
+  val = Math.round(val);
   if (val > 4.7) return 5;
   if (val > 3.7) return 4;
   if (val > 2.8) return 3;
@@ -92,7 +127,8 @@ function getFiberPoints(val) {
 }
 
 // 🟢 Protein Points
-function getProteinPoints(val) {
+function getProteinPoints(val = 0) {
+  val = Math.round(val);
   if (val > 8.0) return 5;
   if (val > 6.4) return 4;
   if (val > 4.8) return 3;
