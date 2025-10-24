@@ -1,22 +1,34 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from './FireBase';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from './FireBase'; // ✅ Import Google provider
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // for redirect
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log('Logged in:', userCredential.user);
-      navigate('/scan'); // ✅ Redirect after login
+      console.log('✅ Logged in:', userCredential.user);
+      navigate('/scan');
     } catch (error) {
-      console.error('Login error:', error.message);
+      console.error('❌ Login error:', error.message);
       alert('Invalid email or password');
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      console.log('✅ Google login:', user.displayName, user.email);
+      navigate('/scan');
+    } catch (error) {
+      console.error('❌ Google login error:', error.message);
+      alert('Google login failed');
     }
   };
 
@@ -46,6 +58,16 @@ const Login = () => {
             Login
           </button>
         </form>
+
+        <div className="mt-6">
+          <button
+            onClick={handleGoogleLogin}
+            className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 transition"
+          >
+            Sign in with Google
+          </button>
+        </div>
+
         <p className="text-sm text-center text-gray-600 mt-4">
           Don’t have an account?{' '}
           <Link to="/signup" className="text-green-600 font-medium hover:underline">

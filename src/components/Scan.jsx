@@ -3,6 +3,52 @@ import BarcodeScannerComponent from 'react-qr-barcode-scanner';
 import { db, auth } from "./FireBase";
 import { collection, addDoc } from 'firebase/firestore';
 import { NutritionScore } from "./NutritionScore";
+import { FaLeaf, FaSeedling, FaBreadSlice, FaGlassWhiskey } from 'react-icons/fa';
+
+const NutriScoreBadges = ({ grade }) => {
+  const map = {
+    A: 'bg-green-800 text-white',
+    B: 'bg-green-400 text-black',
+    C: 'bg-yellow-300 text-black',
+    D: 'bg-orange-400 text-white',
+    E: 'bg-red-500 text-white',
+  };
+
+  const order = ['A', 'B', 'C', 'D', 'E'];
+  return (
+    <div className="flex justify-center gap-2 mb-4">
+      {order.map((g) => (
+        <span
+          key={g}
+          className={`px-3 py-1 rounded font-bold text-sm ${g === grade ? map[g] : 'bg-gray-100 text-gray-500'}`}
+          aria-label={`Nutri-score ${g}`}
+        >
+          {g}
+        </span>
+      ))}
+    </div>
+  );
+};
+
+const ImpactRow = ({ label, value, max = 20, positive = false }) => {
+  const abs = Math.abs(Number(value) || 0);
+  const pct = Math.min(100, Math.round((abs / max) * 100));
+  const barColor = positive ? 'bg-green-500' : 'bg-red-500';
+  const sign = '+';
+  return (
+    <div className="flex flex-col">
+      <div className="flex justify-between text-sm mb-1">
+        <span className="text-gray-700">{label}</span>
+        <span className={`font-semibold ${positive ? 'text-green-700' : 'text-red-700'}`}>
+          {positive ? `${sign}${abs}` : `${sign}${abs}`}
+        </span>
+      </div>
+      <div className="h-2 w-full bg-gray-200 rounded overflow-hidden">
+        <div className={`${barColor} h-full`} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+};
 
 const Scan = () => {
   const [data, setData] = useState('Not Found');
@@ -12,47 +58,89 @@ const Scan = () => {
   const [productName, setProductName] = useState('');
   const [score, setScore] = useState(null);
 
-  const getNutrientExplanation = (nutrients) => {
-    const explain = [];
+// place near other helpers in Scan.jsx
+const generateExplanations = (nutrients, breakdown) => {
+  const out = [];
 
-    if (nutrients?.proteins >= 5) {
-      explain.push("🍗 High protein helps build muscle and keeps you full.");
-    } else {
-      explain.push("🍗 Low protein — not very filling or muscle-supportive.");
-    }
+  // ✅ Defensive check to avoid crash
+  if (!nutrients || typeof nutrients !== 'object') {
+    return ['⚠️ Nutrient data not available.'];
+  }
 
-    if (nutrients?.fiber >= 3) {
-      explain.push("🌾 Good fiber supports digestion and slows sugar absorption.");
-    } else {
-      explain.push("🌾 Low fiber — may not support digestion well.");
-    }
+  // 🥬 Protein
+  const protein = Number(nutrients.proteins || 0);
+  if (protein >= 5) {
+    out.push('🥬 Protein — helps build and repair muscles; keeps you full.');
+  } else if (protein > 0) {
+    out.push('🥬 Protein — low amount; may not keep you full for long.');
+  } else if (breakdown?.protein && breakdown.protein !== 0) {
+    out.push('🥬 Protein — benefit detected in score breakdown.');
+  } else {
+    out.push('🥬 Protein — data not available.');
+  }
 
-    if (nutrients?.['energy-kj'] >= 1000) {
-      explain.push("🔋 High energy — calorie-dense product.");
-    } else {
-      explain.push("🔋 Low energy — not too calorie-heavy.");
-    }
+  // 🌾 Fiber
+  const fiber = Number(nutrients.fiber || 0);
+  if (fiber >= 3) {
+    out.push('🌾 Fiber — supports digestion and slows sugar entering the blood.');
+  } else if (fiber > 0) {
+    out.push('🌾 Fiber — low amount; may not help digestion much.');
+  } else if (breakdown?.fiber && breakdown.fiber !== 0) {
+    out.push('🌾 Fiber — benefit detected in score breakdown.');
+  } else {
+    out.push('🌾 Fiber — data not available.');
+  }
 
-    if (nutrients?.sugars >= 10) {
-      explain.push("🍬 High sugar — may lead to weight gain or diabetes.");
-    } else {
-      explain.push("🍬 Moderate sugar — relatively safe.");
-    }
+  // 🔥 Energy
+  const energy = Number(nutrients['energy-kj'] || 0);
+  if (energy >= 1000) {
+    out.push('🔥 Energy — calorie-dense; watch portion size.');
+  } else if (energy > 0) {
+    out.push('🔥 Energy — not very calorie-heavy.');
+  } else if (breakdown?.energy && breakdown.energy !== 0) {
+    out.push('🔥 Energy — impact detected in score breakdown.');
+  } else {
+    out.push('🔥 Energy — data not available.');
+  }
 
-    if (nutrients?.['saturated-fat'] >= 5) {
-      explain.push("🧈 High saturated fat may raise cholesterol.");
-    } else {
-      explain.push("🧈 Low saturated fat — heart-friendly.");
-    }
+  // 🍯 Sugars
+  const sugars = Number(nutrients.sugars || 0);
+  if (sugars >= 10) {
+    out.push('🍯 Sugar — high amount; can cause weight gain if eaten often.');
+  } else if (sugars > 0) {
+    out.push('🍯 Sugar — moderate or low amount.');
+  } else if (breakdown?.sugars && breakdown.sugars !== 0) {
+    out.push('🍯 Sugar — impact detected in score breakdown.');
+  } else {
+    out.push('🍯 Sugar — data not available.');
+  }
 
-    if (nutrients?.sodium >= 500) {
-      explain.push("🧂 High sodium — may affect blood pressure.");
-    } else {
-      explain.push("🧂 Low sodium — good for heart health.");
-    }
+  // 🥥 Saturated Fat
+  const sat = Number(nutrients['saturated-fat'] || 0);
+  if (sat >= 5) {
+    out.push('🥥 Saturated fat — high amount; may raise cholesterol.');
+  } else if (sat > 0) {
+    out.push('🥥 Saturated fat — low amount; better for heart health.');
+  } else if (breakdown?.saturatedFat && breakdown.saturatedFat !== 0) {
+    out.push('🥥 Saturated fat — impact detected in score breakdown.');
+  } else {
+    out.push('🥥 Saturated fat — data not available.');
+  }
 
-    return explain;
-  };
+  // 🧂 Sodium
+  const sodium = Number(nutrients.sodium || 0);
+  if (sodium >= 500) {
+    out.push('🧂 Sodium — high amount; can raise blood pressure.');
+  } else if (sodium > 0) {
+    out.push('🧂 Sodium — low amount; better for blood pressure.');
+  } else if (breakdown?.sodium && breakdown.sodium !== 0) {
+    out.push('🧂 Sodium — impact detected in score breakdown.');
+  } else {
+    out.push('🧂 Sodium — data not available.');
+  }
+
+  return out;
+};
 
   useEffect(() => {
     const fetchAndSave = async () => {
@@ -145,70 +233,113 @@ const Scan = () => {
               />
             )}
 
-            <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm text-gray-700">
-              <div>🍗 <strong>Protein:</strong> {nutrients?.proteins || 0} g</div>
-              <div>🌾 <strong>Fiber:</strong> {nutrients?.fiber || 0} g</div>
-              <div>🔋 <strong>Energy:</strong> {nutrients?.['energy-kj'] || 0} kJ</div>
-              <div>🍬 <strong>Sugars:</strong> {nutrients?.sugars || 0} g</div>
-              <div>🧈 <strong>Sat. Fat:</strong> {nutrients?.['saturated-fat'] || 0} g</div>
-              <div>🧂 <strong>Sodium:</strong> {nutrients?.sodium || 0} mg</div>
+            {/* Nutri-Score Visual (grade only, raw numeric removed) */}
+            {score?.grade && <NutriScoreBadges grade={score.grade} />}
+
+            {/* Nutrient Summary Cards */}
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
+                <span>Protein</span>
+                <span>{nutrients?.proteins || 0} g</span>
+              </div>
+              <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
+                <span>Fiber</span>
+                <span>{nutrients?.fiber || 0} g</span>
+              </div>
+              <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
+                <span>Energy</span>
+                <span>{nutrients?.['energy-kj'] || 0} kJ</span>
+              </div>
+              <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
+                <span>Sugars</span>
+                <span>{nutrients?.sugars || 0} g</span>
+              </div>
+              <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
+                <span>Sat. Fat</span>
+                <span>{nutrients?.['saturated-fat'] || 0} g</span>
+              </div>
+              <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
+                <span>Sodium</span>
+                <span>{nutrients?.sodium || 0} mg</span>
+              </div>
             </div>
 
+            {/* Reset button */}
+            <div className="mt-5 flex items-center justify-between">
+              {/* Show grade badge only (no raw number) */}
             {score && (
-              <>
-                <div className="mt-5 flex items-center justify-between">
-                  <span className="text-lg font-semibold text-white px-4 py-2 rounded-full bg-green-600">
-                    🅰️ Nutrition Score: {score.grade} ({score.rawScore})
-                  </span>
-                  <button
-                    onClick={() => {
-                      setSaved(false);
-                      setImage(null);
-                      setNutrients(null);
-                      setProductName('');
-                      setScore(null);
-                      setData('Not Found');
-                    }}
-                    className="text-sm text-green-700 underline hover:text-green-900 transition"
-                  >
-                    🔄 Scan Another
-                  </button>
-                </div>
+  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded">
+    <p className="text-lg font-bold text-green-700">Health Score: {score.value}/100</p>
+    <p className="text-sm text-gray-600 mb-2">Based on Nutrition, Additives, and Ingredients</p>
 
-                <div className="mt-4 text-sm text-gray-600">
-                  <p className="font-semibold mb-1">Score Breakdown:</p>
-                  <ul className="space-y-1">
-                    <li>🔴 Energy Impact: +{score.breakdown.energy}</li>
-                    <li>🔴 Sugar Impact: +{score.breakdown.sugars}</li>
-                    <li>🔴 Saturated Fat Impact: +{score.breakdown.saturatedFat}</li>
-                    <li>🔴 Sodium Impact: +{score.breakdown.sodium}</li>
-                    <li>🟢 Fiber Benefit: -{score.breakdown.fiber}</li>
-                    <li>🟢 Protein Benefit: -{score.breakdown.protein}</li>
-                  </ul>
-                  <p className="text-xs text-gray-500 mt-2 italic">
-                    This score is calculated from actual nutrient values. We don’t hide unhealthy results — your health deserves honesty.
-                  </p>
+    <ul className="list-disc list-inside text-sm text-gray-800 space-y-1">
+      {Object.entries(score.breakdown || {}).map(([key, value]) => (
+        <li key={key}>
+          <span className="font-medium capitalize">{key}</span>: {value}
+        </li>
+      ))}
+    </ul>
 
-                  <div className="mt-4 text-sm text-gray-700 space-y-1">
-                    <p className="font-semibold mb-1">🧠 What this score means:</p>
-                    {getNutrientExplanation(nutrients).length > 0 ? (
-                      <ul className="list-disc list-inside space-y-1">
-                        {getNutrientExplanation(nutrients).map((line, index) => (
-                          <li key={index}>{line}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-red-600">
-                        ⚠️ No nutrient data available to explain this product. Please check the packaging or try another scan.
-                      </p>
-                    )}
-                    <p className="text-xs text-gray-500 mt-2 italic">
-                      This product received a <strong>{score.grade}</strong> based on available data. If values are missing, the score may not reflect full accuracy.
-                    </p>
-                  </div>
-                </div>
-                           </>
-            )}
+    {score?.grade && (
+      <span className="inline-block text-lg font-semibold text-white px-4 py-2 rounded-full bg-green-600 mt-4">
+        🅰️ Nutrition Grade: {score.grade}
+      </span>
+    )}
+  </div>
+)}
+              <button
+                onClick={() => {
+                  setSaved(false);
+                  setImage(null);
+                  setNutrients(null);
+                  setProductName('');
+                  setScore(null);
+                  setData('Not Found');
+                }}
+                className="text-sm text-green-700 underline hover:text-green-900 transition"
+              >
+                🔄 Scan Another
+              </button>
+            </div>
+
+            {/* Improved Score Breakdown (keeps internal breakdown display, no raw score) */}
+            <div className="mt-4 text-sm text-gray-700">
+              <p className="font-semibold mb-3">Score Breakdown</p>
+
+              <div className="space-y-3">
+                <ImpactRow label="Energy Impact" value={score?.breakdown?.energy} positive={false} max={20} />
+                <ImpactRow label="Sugar Impact" value={score?.breakdown?.sugars} positive={false} max={20} />
+                <ImpactRow label="Saturated Fat Impact" value={score?.breakdown?.saturatedFat} positive={false} max={20} />
+                <ImpactRow label="Sodium Impact" value={score?.breakdown?.sodium} positive={false} max={20} />
+                <ImpactRow label="Fiber Benefit" value={score?.breakdown?.fiber} positive={true} max={10} />
+                <ImpactRow label="Protein Benefit" value={score?.breakdown?.protein} positive={true} max={10} />
+              </div>
+
+              <p className="text-xs text-gray-500 mt-3 italic">
+                This score is calculated from actual nutrient values. We don’t hide unhealthy results — your health deserves honesty.
+              </p>
+            </div>
+
+            {/* Explanation */}
+            <div className="mt-4 text-sm text-gray-700 space-y-1">
+                <p className="font-semibold mb-1">🧠 What this score means:</p>
+                     {generateExplanations(nutrients, score?.breakdown || {}).length > 0 ? (
+                    <ul className="list-disc list-inside space-y-1">
+                     {generateExplanations(nutrients, score?.breakdown || {}).map((line, index) => (
+                <li key={index}>{line}</li>
+         ))}
+                    </ul>
+       ) : (
+  <p className="text-sm text-red-600">
+    ⚠️ No nutrient data available to explain this product. Please check the packaging or try another scan.
+  </p>
+                  )}    
+              
+               
+              <p className="text-xs text-gray-500 mt-2 italic">
+                This product received a <strong>{score?.grade}</strong> based on available data. If values are missing, the score may not reflect full accuracy.
+              </p>
+            </div>
           </div>
         )}
 

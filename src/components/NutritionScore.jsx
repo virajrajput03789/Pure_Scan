@@ -37,18 +37,19 @@ export const NutritionScore = (nutrients) => {
   else if (score <= 18) grade = "D";
 
   // ✅ Return full breakdown for UI/dashboard
-  return {
-    grade,
-    rawScore: score,
-    breakdown: {
-      energy: energyPoints,
-      sugars: sugarPoints,
-      saturatedFat: satFatPoints,
-      sodium: sodiumPoints,
-      fiber: fiberPoints,
-      protein: proteinPoints,
-    },
-  };
+  const value = Math.min(100, Math.max(0, 100 - score * 5)); // ✅ Convert to 0–100 scale
+return {
+  value,
+  grade,
+  breakdown: {
+    energy: energyPoints,
+    sugars: sugarPoints,
+    saturatedFat: satFatPoints,
+    sodium: sodiumPoints,
+    fiber: fiberPoints,     // ✅ No minus, no Math.abs
+    protein: proteinPoints, // ✅ No minus, no Math.abs
+  }
+};
 };
 
 // 🔴 Energy Points
@@ -135,4 +136,4 @@ function getProteinPoints(val = 0) {
   if (val > 3.2) return 2;
   if (val > 1.6) return 1;
   return 0;
-}
+} 

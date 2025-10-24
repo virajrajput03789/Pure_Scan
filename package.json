@@ -16,6 +16,7 @@
     "react-dom": "^19.1.1",
     "react-firebase-hooks": "^5.1.1",
     "react-hot-toast": "^2.6.0",
+    "react-icons": "^5.5.0",
     "react-qr-barcode-scanner": "^2.1.16",
     "react-router-dom": "^7.9.4",
     "tailwindcss": "^4.1.14"
