@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { auth, googleProvider } from './FireBase'; // ✅ Import Google provider
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup
+} from 'firebase/auth';
+import { auth, googleProvider } from './FireBase';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -15,8 +18,8 @@ const Login = () => {
       console.log('✅ Logged in:', userCredential.user);
       navigate('/scan');
     } catch (error) {
-      console.error('❌ Login error:', error.message);
-      alert('Invalid email or password');
+      console.error('❌ Login error:', error.code, error.message);
+      alert('Login failed: ' + error.code);
     }
   };
 
@@ -27,8 +30,8 @@ const Login = () => {
       console.log('✅ Google login:', user.displayName, user.email);
       navigate('/scan');
     } catch (error) {
-      console.error('❌ Google login error:', error.message);
-      alert('Google login failed');
+      console.error('❌ Google login error:', error.code, error.message);
+      alert('Google login failed: ' + error.code);
     }
   };
 
@@ -36,6 +39,7 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white p-8 rounded shadow">
         <h2 className="text-2xl font-bold text-green-700 mb-6 text-center">Login to Your Account</h2>
+
         <form className="space-y-4" onSubmit={handleLogin}>
           <input
             type="email"
