@@ -4,6 +4,9 @@ import { db, auth } from "./FireBase";
 import { collection, addDoc } from 'firebase/firestore';
 import { NutritionScore } from "./NutritionScore";
 import { FaLeaf, FaSeedling, FaBreadSlice, FaGlassWhiskey } from 'react-icons/fa';
+import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+
+
 
 const NutriScoreBadges = ({ grade }) => {
   const map = {
@@ -57,8 +60,19 @@ const Scan = () => {
   const [nutrients, setNutrients] = useState(null);
   const [productName, setProductName] = useState('');
   const [score, setScore] = useState(null);
+  const [isIncomplete, setIsIncomplete] = useState(false);
 
 // place near other helpers in Scan.jsx
+
+const isEmptyNutrientData = (nutrients) => {
+  if (!nutrients || typeof nutrients !== 'object') return true;
+  const keysToCheck = ['calories', 'sugars', 'saturatedFat', 'sodium', 'fiber', 'protein'];
+  return keysToCheck.every((key) => {
+    const val = Number(nutrients[key] || 0);
+    return val === 0 || isNaN(val);
+  });
+};
+
 const generateExplanations = (nutrients, breakdown) => {
   const out = [];
 
@@ -66,6 +80,20 @@ const generateExplanations = (nutrients, breakdown) => {
   if (!nutrients || typeof nutrients !== 'object') {
     return ['⚠️ Nutrient data not available.'];
   }
+
+  // 🔥 Calories
+const calories = Number(nutrients.calories || 0);
+if (calories >= 400) {
+  out.push('🔥 Calories — high amount; may lead to weight gain if eaten often.');
+} else if (calories >= 150) {
+  out.push('🔥 Calories — moderate amount; consider portion size.');
+} else if (calories > 0) {
+  out.push('🔥 Calories — low amount; suitable for light snacking.');
+} else if (breakdown?.calories && breakdown.calories !== 0) {
+  out.push('🔥 Calories — impact detected in score breakdown.');
+} else {
+  out.push('🔥 Calories — data not available.');
+}
 
   // 🥬 Protein
   const protein = Number(nutrients.proteins || 0);
@@ -159,13 +187,57 @@ const generateExplanations = (nutrients, breakdown) => {
           setProductName('Product not found');
           setScore(null);
           return;
+          
         }
+
+        const nutriments = json.product.nutriments;
+
+       const nutrients = {
+  calories: nutriments['energy-kcal'] || nutriments.energy_kcal || 0,
+  energy: nutriments['energy-kj'] || 0,
+  sugars: nutriments.sugars || 0,
+  saturatedFat: nutriments['saturated-fat'] || 0,
+  sodium: nutriments.sodium || 0, // in grams
+  fiber: nutriments.fiber || 0,
+  protein: nutriments.proteins || 0,
+};
+
+       const isEmptyNutrient = Object.values(nutrients).every(val => val === 0 || val === null);
+if (isEmptyNutrient) {
+  setIsIncomplete(true);
+  setSaved(true);
+  setImage(null);
+  setNutrients(null);
+  setProductName('');
+  setScore(null);
+  return;
+}
+
+        const scoreResult = NutritionScore(nutrients);
+        const docRef = doc(db, 'scans', `${user.uid}_${data}`);
+             await setDoc(docRef, {
+             barcode: data,
+             productName: json.product.product_name || 'Unnamed Product',
+             imageUrl: json.product.image_url || null,
+             nutrients,
+             score: scoreResult,
+             isIncomplete: isEmptyNutrient,
+             scannedAt: serverTimestamp(),
+          });
+
+            setImage(json.product.image_url || null);
+            setNutrients(nutrients);
+            setProductName(json.product.product_name || 'Unnamed Product');
+            setScore(scoreResult);
+            setSaved(true);
+         
 
         const nutrientsData = json.product.nutriments || {};
         const imageUrl = json.product.image_url || null;
         const name = json.product.product_name || 'Unknown Product';
 
         const scoreValue = NutritionScore({
+          calories: nutrientsData['energy-kcal'] || nutrientsData.energy_kcal || 0,
           energy: nutrientsData['energy-kj'] || 0,
           sugars: nutrientsData['sugars'] || 0,
           saturatedFat: nutrientsData['saturated-fat'] || 0,
@@ -175,7 +247,7 @@ const generateExplanations = (nutrients, breakdown) => {
         });
 
         setImage(imageUrl);
-        setNutrients(nutrientsData);
+        setNutrients(nutrients);
         setProductName(name);
         setScore(scoreValue);
 
@@ -206,142 +278,160 @@ const generateExplanations = (nutrients, breakdown) => {
           Point your camera at a barcode to scan and analyze the product.
         </p>
 
-        {!saved ? (
-          <div className="w-full max-w-md border rounded-md overflow-hidden shadow-md">
-            <BarcodeScannerComponent
-              width={500}
-              height={300}
-              onUpdate={(err, result) => {
-                if (result) {
-                  setData(result.text);
-                  setSaved(false);
-                }
-              }}
-            />
-          </div>
-        ) : (
-          <div className="mt-6 w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-md p-5 text-left">
-            <h2 className="text-2xl font-bold text-green-700 mb-3 flex items-center gap-2">
-              🛒 {productName}
-            </h2>
+{!saved ? (
+  <div className="w-full max-w-md border rounded-md overflow-hidden shadow-md">
+    <BarcodeScannerComponent
+      width={500}
+      height={300}
+      onUpdate={(err, result) => {
+        if (result) {
+          setData(result.text);
+          setSaved(false);
+        }
+      }}
+    />
+  </div>
+) : isIncomplete ? (
+  <div className="mt-6 w-full max-w-md bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-lg shadow-md p-5 text-left">
+    ⚠️ Nutrient data not available. This product received a based on available data. If values are missing, the score may not reflect full accuracy.
+    <br />
+    Scanned Code: <strong>{data}</strong>
+    <br />
+    <button
+      onClick={() => {
+        setSaved(false);
+        setImage(null);
+        setNutrients(null);
+        setProductName('');
+        setScore(null);
+        setData('Not Found');
+        setIsIncomplete(false);
+      }}
+      className="mt-4 text-sm text-green-700 underline hover:text-green-900 transition"
+    >
+      🔄 Scan Another
+    </button>
+  </div>
+) : (
+  <div className="mt-6 w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-md p-5 text-left">
+    <h2 className="text-2xl font-bold text-green-700 mb-3 flex items-center gap-2">
+      🛒 {productName}
+    </h2>
 
-            {image && (
-              <img
-                src={image}
-                alt="Product"
-                className="w-40 h-40 object-contain mx-auto rounded border border-gray-300 shadow-sm mb-4"
-              />
-            )}
-
-            {/* Nutri-Score Visual (grade only, raw numeric removed) */}
-            {score?.grade && <NutriScoreBadges grade={score.grade} />}
-
-            {/* Nutrient Summary Cards */}
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
-                <span>Protein</span>
-                <span>{nutrients?.proteins || 0} g</span>
-              </div>
-              <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
-                <span>Fiber</span>
-                <span>{nutrients?.fiber || 0} g</span>
-              </div>
-              <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
-                <span>Energy</span>
-                <span>{nutrients?.['energy-kj'] || 0} kJ</span>
-              </div>
-              <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
-                <span>Sugars</span>
-                <span>{nutrients?.sugars || 0} g</span>
-              </div>
-              <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
-                <span>Sat. Fat</span>
-                <span>{nutrients?.['saturated-fat'] || 0} g</span>
-              </div>
-              <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
-                <span>Sodium</span>
-                <span>{nutrients?.sodium || 0} mg</span>
-              </div>
-            </div>
-
-            {/* Reset button */}
-            <div className="mt-5 flex items-center justify-between">
-              {/* Show grade badge only (no raw number) */}
-            {score && (
-  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded">
-    <p className="text-lg font-bold text-green-700">Health Score: {score.value}/100</p>
-    <p className="text-sm text-gray-600 mb-2">Based on Nutrition, Additives, and Ingredients</p>
-
-    <ul className="list-disc list-inside text-sm text-gray-800 space-y-1">
-      {Object.entries(score.breakdown || {}).map(([key, value]) => (
-        <li key={key}>
-          <span className="font-medium capitalize">{key}</span>: {value}
-        </li>
-      ))}
-    </ul>
-
-    {score?.grade && (
-      <span className="inline-block text-lg font-semibold text-white px-4 py-2 rounded-full bg-green-600 mt-4">
-        🅰️ Nutrition Grade: {score.grade}
-      </span>
+    {image && (
+      <img
+        src={image}
+        alt="Product"
+        className="w-40 h-40 object-contain mx-auto rounded border border-gray-300 shadow-sm mb-4"
+      />
     )}
+
+    {score?.grade && <NutriScoreBadges grade={score.grade} />}
+
+    <div className="grid grid-cols-2 gap-3 text-sm">
+      <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
+        <span>Calories</span>
+        <span>{nutrients?.calories || 0} kcal</span>
+      </div>
+      <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
+        <span>Protein</span>
+        <span>{nutrients?.protein || 0} g</span>
+      </div>
+      <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
+        <span>Fiber</span>
+        <span>{nutrients?.fiber || 0} g</span>
+      </div>
+      <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
+        <span>Energy</span>
+        <span>{nutrients?.energy || 0} kJ</span>
+      </div>
+      <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
+        <span>Sugars</span>
+        <span>{nutrients?.sugars || 0} g</span>
+      </div>
+      <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
+        <span>Sat. Fat</span>
+        <span>{nutrients?.saturatedFat || 0} g</span>
+      </div>
+      <div className="bg-green-100 text-green-800 p-2 rounded shadow-sm flex justify-between">
+        <span>Sodium</span>
+        <span>{nutrients?.sodium ? Math.round(nutrients.sodium * 1000) : 0} mg</span>
+      </div>
+    </div>
+
+    <div className="mt-5 flex items-center justify-between">
+      {score && (
+        <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded">
+          <p className="text-lg font-bold text-green-700">Health Score: {score.value}/100</p>
+          <p className="text-sm text-gray-600 mb-2">Based on Nutrition, Additives, and Ingredients</p>
+
+          <ul className="list-disc list-inside text-sm text-gray-800 space-y-1">
+            {Object.entries(score.breakdown || {}).map(([key, value]) => (
+              <li key={key}>
+                <span className="font-medium capitalize">{key}</span>: {value}
+              </li>
+            ))}
+          </ul>
+
+          {score?.grade && (
+            <span className="inline-block text-lg font-semibold text-white px-4 py-2 rounded-full bg-green-600 mt-4">
+              🅰️ Nutrition Grade: {score.grade}
+            </span>
+          )}
+        </div>
+      )}
+      <button
+        onClick={() => {
+          setSaved(false);
+          setImage(null);
+          setNutrients(null);
+          setProductName('');
+          setScore(null);
+          setData('Not Found');
+        }}
+        className="text-sm text-green-700 underline hover:text-green-900 transition"
+      >
+        🔄 Scan Another
+      </button>
+    </div>
+
+    <div className="mt-4 text-sm text-gray-700">
+      <p className="font-semibold mb-3">Score Breakdown</p>
+
+      <div className="space-y-3">
+        <ImpactRow label="Calorie Impact" value={score?.breakdown?.calories} positive={false} max={10} />
+        <ImpactRow label="Energy Impact" value={score?.breakdown?.energy} positive={false} max={20} />
+        <ImpactRow label="Sugar Impact" value={score?.breakdown?.sugars} positive={false} max={20} />
+        <ImpactRow label="Saturated Fat Impact" value={score?.breakdown?.saturatedFat} positive={false} max={20} />
+        <ImpactRow label="Sodium Impact" value={score?.breakdown?.sodium} positive={false} max={20} />
+        <ImpactRow label="Fiber Benefit" value={score?.breakdown?.fiber} positive={true} max={10} />
+        <ImpactRow label="Protein Benefit" value={score?.breakdown?.protein} positive={true} max={10} />
+      </div>
+
+      <p className="text-xs text-gray-500 mt-3 italic">
+        This score is calculated from actual nutrient values. We don’t hide unhealthy results — your health deserves honesty.
+      </p>
+    </div>
+
+    <div className="mt-4 text-sm text-gray-700 space-y-1">
+      <p className="font-semibold mb-1">🧠 What this score means:</p>
+      {generateExplanations(nutrients, score?.breakdown || {}).length > 0 ? (
+        <ul className="list-disc list-inside space-y-1">
+          {generateExplanations(nutrients, score?.breakdown || {}).map((line, index) => (
+            <li key={index}>{line}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-red-600">
+          ⚠️ No nutrient data available to explain this product. Please check the packaging or try another scan.
+        </p>
+      )}
+      <p className="text-xs text-gray-500 mt-2 italic">
+        This product received a <strong>{score?.grade}</strong> based on available data. If values are missing, the score may not reflect full accuracy.
+      </p>
+    </div>
   </div>
 )}
-              <button
-                onClick={() => {
-                  setSaved(false);
-                  setImage(null);
-                  setNutrients(null);
-                  setProductName('');
-                  setScore(null);
-                  setData('Not Found');
-                }}
-                className="text-sm text-green-700 underline hover:text-green-900 transition"
-              >
-                🔄 Scan Another
-              </button>
-            </div>
-
-            {/* Improved Score Breakdown (keeps internal breakdown display, no raw score) */}
-            <div className="mt-4 text-sm text-gray-700">
-              <p className="font-semibold mb-3">Score Breakdown</p>
-
-              <div className="space-y-3">
-                <ImpactRow label="Energy Impact" value={score?.breakdown?.energy} positive={false} max={20} />
-                <ImpactRow label="Sugar Impact" value={score?.breakdown?.sugars} positive={false} max={20} />
-                <ImpactRow label="Saturated Fat Impact" value={score?.breakdown?.saturatedFat} positive={false} max={20} />
-                <ImpactRow label="Sodium Impact" value={score?.breakdown?.sodium} positive={false} max={20} />
-                <ImpactRow label="Fiber Benefit" value={score?.breakdown?.fiber} positive={true} max={10} />
-                <ImpactRow label="Protein Benefit" value={score?.breakdown?.protein} positive={true} max={10} />
-              </div>
-
-              <p className="text-xs text-gray-500 mt-3 italic">
-                This score is calculated from actual nutrient values. We don’t hide unhealthy results — your health deserves honesty.
-              </p>
-            </div>
-
-            {/* Explanation */}
-            <div className="mt-4 text-sm text-gray-700 space-y-1">
-                <p className="font-semibold mb-1">🧠 What this score means:</p>
-                     {generateExplanations(nutrients, score?.breakdown || {}).length > 0 ? (
-                    <ul className="list-disc list-inside space-y-1">
-                     {generateExplanations(nutrients, score?.breakdown || {}).map((line, index) => (
-                <li key={index}>{line}</li>
-         ))}
-                    </ul>
-       ) : (
-  <p className="text-sm text-red-600">
-    ⚠️ No nutrient data available to explain this product. Please check the packaging or try another scan.
-  </p>
-                  )}    
-              
-               
-              <p className="text-xs text-gray-500 mt-2 italic">
-                This product received a <strong>{score?.grade}</strong> based on available data. If values are missing, the score may not reflect full accuracy.
-              </p>
-            </div>
-          </div>
-        )}
 
         <p className="mt-6 text-lg font-semibold text-green-700">
           Scanned Code: <span className="text-gray-900">{data}</span>

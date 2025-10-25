@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { auth, db } from "./FireBase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
+import { doc, deleteDoc } from "firebase/firestore";
 
 function ScanHistory() {
   const [scans, setScans] = useState([]);
   const [loading, setLoading] = useState(true);
+  
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -13,17 +15,36 @@ function ScanHistory() {
 
       const q = query(
         collection(db, "scanHistory"),
-        where("uid", "==", user.uid)
+        where("uid", "==", user.uid),
+        orderBy("timestamp", "desc")
       );
 
       const snapshot = await getDocs(q);
-      const data = snapshot.docs.map(doc => doc.data());
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setScans(data);
       setLoading(false);
     };
 
     fetchHistory();
   }, []);
+
+
+  const handleDelete = async (scanId) => {
+  const confirm = window.confirm("Are you sure you want to delete this scan?");
+  if (!confirm) return;
+
+  try {
+    await deleteDoc(doc(db, "scanHistory", scanId));
+    setScans(prev => prev.filter(scan => scan.id !== scanId));
+    console.log("🗑️ Deleted scan:", scanId);
+  } catch (err) {
+    console.error("❌ Delete failed:", err);
+  }
+};
+
+
+
+
 
   if (loading) return (
     <div className="p-4 max-w-screen-md mx-auto space-y-4 animate-pulse">
@@ -52,11 +73,11 @@ function ScanHistory() {
               <p>
                 <strong>Nutrition Score:</strong>{" "}
                 <span className={`px-2 py-1 rounded text-white text-xs md:text-sm ${
-                  scan.nutritionScore >= 80 ? "bg-green-500" :
-                  scan.nutritionScore >= 50 ? "bg-yellow-500" :
+                  scan.nutritionScore?.value >= 80 ? "bg-green-500" :
+                  scan.nutritionScore?.value >= 50 ? "bg-yellow-500" :
                   "bg-red-500"
                 }`}>
-                  {scan.nutritionScore}
+                  {scan.nutritionScore?.value} ({scan.nutritionScore?.grade})
                 </span>
               </p>
               <p>
@@ -65,7 +86,15 @@ function ScanHistory() {
                   ? new Date(scan.timestamp.seconds * 1000).toLocaleString()
                   : "Unknown"}
               </p>
+              {scan.image && (
+                <img src={scan.image} alt={scan.productName} className="w-24 mt-2 rounded" />
+              )}
+              <button
+                   onClick={() => handleDelete(scan.id)}
+                   className="mt-2 px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"> Delete
+              </button>
             </li>
+            
           ))}
         </ul>
       )}

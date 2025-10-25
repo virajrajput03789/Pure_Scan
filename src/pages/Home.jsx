@@ -13,7 +13,7 @@ const Home = () => {
             Eat Smarter. Live Better.
           </h1>
           <p className="text-lg text-gray-700">
-            Smart Food Analyzer helps you scan food products, understand their nutritional value, and make informed choices — instantly.
+            PureScan Helps You To Scan a Food Products Barcode And Understand Their Nutritional Value, And Make Informed Choices — Instantly.
           </p>
           <Link
             to="/scan"

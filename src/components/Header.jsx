@@ -26,7 +26,7 @@ function Header() {
             className="w-10 h-10 rounded-full object-cover"
           />
           <h1 className="text-xl md:text-2xl font-bold text-white">
-            Smart Food Analyzer
+            PureScan
           </h1>
         </div>
 

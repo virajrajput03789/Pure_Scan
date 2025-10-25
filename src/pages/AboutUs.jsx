@@ -9,11 +9,11 @@ const AboutUs = () => {
       <div className="flex-grow flex flex-col items-center justify-center px-6 py-12">
         <div className="max-w-4xl text-center space-y-6">
           <h1 className="text-3xl font-semibold text-green-600 mb-2">
-            About Smart Food Analyzer
+            About PureScan
           </h1>
 
           <p className="text-gray-700 leading-relaxed">
-            Smart Food Analyzer is  built to help 
+            PureScan is built to help 
             people make better food choices. It scans food items, evaluates
             their nutritional quality, and helps users stay aware of what they
             consume daily.

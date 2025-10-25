@@ -1,4 +1,4 @@
-# Smart Food Analyzer
+# PureScan
 
 A React Vite app to scan food barcodes, analyze nutrition, and help users make healthier choices.
 
