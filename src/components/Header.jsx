@@ -21,7 +21,7 @@ function Header() {
         {/* Logo + Name */}
         <div className="flex items-center gap-3">
           <img
-            src="/logo2.jpg"
+            src="/logo1.jpg"
             alt="Smart Food Analyzer Logo"
             className="w-10 h-10 rounded-full object-cover"
           />
