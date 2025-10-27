@@ -1,13 +1,23 @@
 import React from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header'; // Optional if you want header here
+import { motion } from 'framer-motion';
 
 const AboutUs = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-white text-gray-800">
-     
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="flex flex-col min-h-screen bg-white text-gray-800"
+    >
       <div className="flex-grow flex flex-col items-center justify-center px-6 py-12">
-        <div className="max-w-4xl text-center space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="max-w-4xl text-center space-y-6"
+        >
           <h1 className="text-3xl font-semibold text-green-600 mb-2">
             About PureScan
           </h1>
@@ -57,11 +67,9 @@ const AboutUs = () => {
               individual can make healthy decisions with confidence.
             </p>
           </section>
-        </div>
+        </motion.div>
       </div>
-
-     
-    </div>
+    </motion.div>
   );
 };
 
