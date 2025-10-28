@@ -1,20 +1,26 @@
-import { Routes, Route, BrowserRouter, Navigate, useLocation } from 'react-router-dom';
+import {
+  Routes,
+  Route,
+  BrowserRouter,
+  Navigate,
+  useLocation,
+} from 'react-router-dom';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 import Home from './pages/Home.jsx';
 import AboutUs from './pages/AboutUs.jsx';
 import ContactUs from './pages/ContactUs.jsx';
 import Scan from './components/Scan.jsx';
-import Login from "./components/LoginComponent.jsx";
+import Login from './components/LoginComponent.jsx';
 import SignIn from './components/SignIn.jsx';
 import PrivateRoute from './components/PrivateRoute.jsx';
 import Dashboard from './components/DashBoard.jsx';
 import ScanHistory from './components/ScanHistory.jsx';
-import ScrollToTopButton from './components/ScrollToTopButton.jsx'; // ✅ NEW
-import { Toaster } from 'react-hot-toast'; // ✅ NEW
-import Profile from './components/Profile.jsx'; // ✅ NEW
-import ScanTypeSelector from './components/ScanTypeSelector';
-import BackButton from './pages/BackButton'; // ✅ ADDED
+import ScrollToTopButton from './components/ScrollToTopButton.jsx';
+import { Toaster } from 'react-hot-toast';
+import Profile from './components/Profile.jsx';
+import ScanTypeSelector from './components/ScanTypeSelector.jsx';
+import BackButton from './pages/BackButton.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -30,7 +36,7 @@ function AppContent() {
     '/history',
     '/profile',
     '/login',
-    '/signin'
+    '/signin',
   ];
 
   const shouldShowBackButton = showBackButtonOn.includes(location.pathname);
@@ -45,7 +51,14 @@ function AppContent() {
           <Route path="/home" element={<Navigate to="/" />} />
           <Route path="/aboutUs" element={<AboutUs />} />
           <Route path="/contactUs" element={<ContactUs />} />
-          <Route path="/select-scan" element={<ScanTypeSelector />} />
+          <Route
+            path="/select-scan"
+            element={
+              <PrivateRoute>
+                <ScanTypeSelector />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/scan"
             element={
@@ -84,8 +97,8 @@ function AppContent() {
         </Routes>
       </main>
       <Footer />
-      <ScrollToTopButton /> {/* ✅ Floating scroll button */}
-      <Toaster position="top-right" /> {/* ✅ Toast notifications */}
+      <ScrollToTopButton />
+      <Toaster position="top-right" />
     </div>
   );
 }
