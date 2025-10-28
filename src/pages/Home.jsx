@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import Lottie from "lottie-react";
 import kaedeAnim from "../assets/kaede.json";
 
+
+
 const Home = () => {
   return (
     <motion.div
@@ -47,12 +49,12 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.4 }}
           >
-            <Link
-              to="/scan"
-              className="inline-block bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition"
-            >
-              Start Scanning
-            </Link>
+           <Link
+  to="/select-scan"
+  className="inline-block bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition"
+>
+  Start Scanning
+</Link>
           </motion.div>
         </div>
       </section>

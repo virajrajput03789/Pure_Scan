@@ -6,6 +6,8 @@ import { NutritionScore } from "./NutritionScore";
 import { FaLeaf, FaSeedling, FaBreadSlice, FaGlassWhiskey } from 'react-icons/fa';
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { motion } from "framer-motion";
+import { useLocation } from 'react-router-dom';
+
 
 
 
@@ -63,6 +65,10 @@ const Scan = () => {
   const [score, setScore] = useState(null);
   const [isIncomplete, setIsIncomplete] = useState(false);
   const [productNotFound, setProductNotFound] = useState(false);
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const scanType = params.get('type'); // 'food' or 'cosmetics'
+
 
 // place near other helpers in Scan.jsx
 

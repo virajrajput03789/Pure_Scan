@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from './FireBase';
+import { motion } from 'framer-motion'; // ✅ motion import added
 
 const Signup = () => {
   const [name, setName] = useState('');
@@ -22,7 +23,12 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="flex items-center justify-center min-h-screen bg-gray-50 px-4"
+    >
       <div className="w-full max-w-md bg-white p-8 rounded shadow">
         <h2 className="text-2xl font-bold text-green-700 mb-6 text-center">Create an Account</h2>
         <form className="space-y-4" onSubmit={handleSignup}>
@@ -61,7 +67,7 @@ const Signup = () => {
           </Link>
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
