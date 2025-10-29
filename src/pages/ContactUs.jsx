@@ -9,7 +9,7 @@ const ContactUs = () => {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="flex flex-col min-h-screen bg-white text-gray-800"
     >
-      <main className="flex-grow container mx-auto px-6 py-12">
+      <main className="flex-grow container mx-auto px-6 pt-6 pb-12"> {/* updated padding */}
         <div className="relative w-fit mx-auto mb-8">
           <motion.h1
             initial={{ y: -20, opacity: 0 }}

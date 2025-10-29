@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom';
 import Lottie from "lottie-react";
 import kaedeAnim from "../assets/kaede.json";
 
-
-
 const Home = () => {
   return (
     <motion.div
@@ -15,7 +13,7 @@ const Home = () => {
       className="flex flex-col min-h-screen bg-white text-gray-800"
     >
       {/* Hero Section */}
-      <section className="flex-grow flex flex-col items-center justify-center px-6 py-12 text-center">
+      <section className="flex-grow flex flex-col items-center justify-center px-6 pt-6 pb-12 text-center">
         <div className="max-w-3xl space-y-6">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -23,9 +21,7 @@ const Home = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="w-48 h-48 mx-auto"
           >
-            
             <Lottie animationData={kaedeAnim} loop={true} />
-            
           </motion.div>
 
           <motion.h1
@@ -49,12 +45,12 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.4 }}
           >
-           <Link
-  to="/select-scan"
-  className="inline-block bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition"
->
-  Start Scanning
-</Link>
+            <Link
+              to="/select-scan"
+              className="inline-block bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition"
+            >
+              Start Scanning
+            </Link>
           </motion.div>
         </div>
       </section>

@@ -39,7 +39,7 @@ function Profile() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="max-w-md mx-auto p-6"
+      className="max-w-md mx-auto px-6 pt-6 pb-12" // ✅ updated padding for tighter top
     >
       <div className="relative w-fit mx-auto mb-4">
         <motion.h2

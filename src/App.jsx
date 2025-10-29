@@ -59,13 +59,13 @@ function AppContent() {
             }
           />
           <Route
-            path="/scan"
-            element={
-              <PrivateRoute>
-                <Scan />
-              </PrivateRoute>
-            }
-          />
+  path="/scan"
+  element={
+    <PrivateRoute>
+      <Scan scanType="food" /> {/* ✅ Yeh line fix karegi */}
+    </PrivateRoute>
+  }
+/>
           <Route
             path="/dashboard"
             element={
@@ -91,13 +91,13 @@ function AppContent() {
             }
           />
           <Route
-           path="/scan-cosmetics"
-           element={
-             <PrivateRoute>
-                <CosmeticScan />
-              </PrivateRoute>
-            }
-         />
+  path="/scan-cosmetics"
+  element={
+    <PrivateRoute>
+      <CosmeticScan scanType="cosmetic" />
+    </PrivateRoute>
+  }
+/>
           <Route path="/login" element={<Login />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="*" element={<Navigate to="/" />} />

@@ -11,7 +11,7 @@ const AboutUs = () => {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="flex flex-col min-h-screen bg-white text-gray-800"
     >
-      <div className="flex-grow flex flex-col items-center justify-center px-6 py-12">
+      <div className="flex-grow flex flex-col items-center justify-start px-6 pt-6 pb-12"> {/* updated padding */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

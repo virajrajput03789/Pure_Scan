@@ -1,7 +1,11 @@
 export function isFoodBarcode(barcode) {
-  return /^3|^4|^5|^6/.test(barcode);
-}
+  if (!barcode || typeof barcode !== "string") return false;
 
-export function isCosmeticBarcode(barcode) {
-  return /^1|^7|^8|^9/.test(barcode);
+  // Allow all barcodes with valid length (12–14 digits)
+  const isValidLength = barcode.length >= 12 && barcode.length <= 14;
+
+  // Optional: allow only numeric barcodes
+  const isNumeric = /^\d+$/.test(barcode);
+
+  return isValidLength && isNumeric;
 }

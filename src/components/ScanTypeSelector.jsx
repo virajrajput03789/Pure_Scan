@@ -6,9 +6,13 @@ import { motion } from 'framer-motion';
 const ScanTypeSelector = () => {
   const navigate = useNavigate();
 
-  const handleSelect = (type) => {
-    navigate(`/scan?type=${type}`);
-  };
+const handleSelect = (type) => {
+  if (type === 'food') {
+    navigate('/scan'); // ✅ FoodScan.jsx
+  } else if (type === 'cosmetics') {
+    navigate('/scan-cosmetics'); // ✅ CosmeticScan.jsx
+  }
+};
 
   return (
     <motion.div
