@@ -4,7 +4,7 @@ import Footer from './components/Footer.jsx';
 import Home from './pages/Home.jsx';
 import AboutUs from './pages/AboutUs.jsx';
 import ContactUs from './pages/ContactUs.jsx';
-import Scan from './components/Scan.jsx';
+import Scan from './components/FoodScan.jsx';
 import Login from './components/LoginComponent.jsx';
 import SignIn from './components/SignIn.jsx';
 import PrivateRoute from './components/PrivateRoute.jsx';
@@ -15,6 +15,8 @@ import { Toaster } from 'react-hot-toast';
 import Profile from './components/Profile.jsx';
 import ScanTypeSelector from './components/ScanTypeSelector.jsx';
 import BackButton from './pages/BackButton.jsx';
+import CosmeticScan from "./components/CosmeticScan";
+
 
 function AppContent() {
   const location = useLocation();
@@ -36,15 +38,13 @@ function AppContent() {
   const shouldShowBackButton = showBackButtonOn.includes(location.pathname);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50 overflow-x-hidden">
   
       <Header />
-      {shouldShowBackButton && (
-  <div className="relative">
-    <BackButton />
-  </div>
-)}
-      <main className="flex-grow pt-36 sm:pt-28 md:pt-40 lg:pt-44">
+      {shouldShowBackButton && (<div className="relative"><BackButton /></div>)}
+
+      <main className="flex-grow pt-28 sm:pt-24 md:pt-32 lg:pt-36">
+
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Navigate to="/" />} />
@@ -90,6 +90,14 @@ function AppContent() {
               </PrivateRoute>
             }
           />
+          <Route
+           path="/scan-cosmetics"
+           element={
+             <PrivateRoute>
+                <CosmeticScan />
+              </PrivateRoute>
+            }
+         />
           <Route path="/login" element={<Login />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="*" element={<Navigate to="/" />} />

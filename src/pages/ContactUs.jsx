@@ -113,7 +113,7 @@ const ContactUs = () => {
           <div className="text-center text-sm text-gray-500 mt-8">
             Or email us directly at{' '}
             <a href="mailto:support@smartfoodanalyzer.com" className="text-green-600 underline">
-              support@smartfoodanalyzer.com
+              support@purescan.com
             </a>
           </div>
         </motion.div>

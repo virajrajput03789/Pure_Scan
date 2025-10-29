@@ -39,7 +39,7 @@ const ScanTypeSelector = () => {
             onClick={() => handleSelect('cosmetics')}
             className="flex items-center justify-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-full text-lg font-semibold shadow transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-gradient-to-r hover:from-pink-500 hover:to-rose-500"
           >
-            💄🧴🪞 <span>Cosmetics</span>
+            💄🧴🪞 <span>Cosmetics Products</span>
           </button>
         </div>
       </div>

@@ -16,7 +16,7 @@ const Login = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log('✅ Logged in:', userCredential.user);
-      navigate('/scan');
+      navigate("/select-scan", { replace: true });
     } catch (error) {
       console.error('❌ Login error:', error.code, error.message);
       alert('Login failed: ' + error.code);
@@ -28,7 +28,7 @@ const Login = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       console.log('✅ Google login:', user.displayName, user.email);
-      navigate('/scan');
+      navigate("/select-scan", { replace: true });
     } catch (error) {
       console.error('❌ Google login error:', error.code, error.message);
       alert('Google login failed: ' + error.code);

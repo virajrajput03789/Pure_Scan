@@ -7,6 +7,8 @@ import { FaLeaf, FaSeedling, FaBreadSlice, FaGlassWhiskey } from 'react-icons/fa
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { motion } from "framer-motion";
 import { useLocation } from 'react-router-dom';
+import { isFoodBarcode } from "../utils/barcodeValidator";
+
 
 
 
@@ -68,6 +70,7 @@ const Scan = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const scanType = params.get('type'); // 'food' or 'cosmetics'
+  const [warning, setWarning] = useState("");
 
 
 // place near other helpers in Scan.jsx
@@ -182,6 +185,12 @@ if (calories >= 400) {
     const fetchAndSave = async () => {
       const user = auth.currentUser;
       if (!user || data === 'Not Found' || saved) return;
+      
+
+if (!isFoodBarcode(data)) {
+  setWarning("⚠️ This barcode does not belong to a food product.");
+  return;
+}
 
       try {
         const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${data}.json`);
