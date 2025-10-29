@@ -1,10 +1,4 @@
-import {
-  Routes,
-  Route,
-  BrowserRouter,
-  Navigate,
-  useLocation,
-} from 'react-router-dom';
+import {Routes,Route,BrowserRouter,Navigate,useLocation,} from 'react-router-dom';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 import Home from './pages/Home.jsx';
@@ -43,9 +37,14 @@ function AppContent() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
+  
       <Header />
-      {shouldShowBackButton && <BackButton />} {/* ✅ Back button injected */}
-      <main className="flex-grow">
+      {shouldShowBackButton && (
+  <div className="relative">
+    <BackButton />
+  </div>
+)}
+      <main className="flex-grow pt-36 sm:pt-28 md:pt-40 lg:pt-44">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Navigate to="/" />} />
@@ -99,6 +98,7 @@ function AppContent() {
       <Footer />
       <ScrollToTopButton />
       <Toaster position="top-right" />
+      
     </div>
   );
 }
