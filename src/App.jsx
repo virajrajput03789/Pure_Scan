@@ -28,6 +28,7 @@ function AppContent() {
     '/contactUs',
     '/select-scan',
     '/scan',
+    '/scan-cosmetics',
     '/dashboard',
     '/history',
     '/profile',

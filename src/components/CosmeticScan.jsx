@@ -5,6 +5,7 @@ import { collection, addDoc, doc, setDoc, serverTimestamp } from 'firebase/fires
 import { analyzeIngredients } from '../utils/analyzeCosmetic';
 import { motion } from 'framer-motion';
 
+
 const CosmeticScan = () => {
   const [data, setData] = useState('Not Found');
   const [saved, setSaved] = useState(false);
