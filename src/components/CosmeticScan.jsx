@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import BarcodeScannerComponent from 'react-qr-barcode-scanner';
 import { db, auth } from './FireBase';
 import { collection, addDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { analyzeIngredients } from '../utils/analyzeCosmetic';
+import { analyzeIngredients } from '../utils/analyzeIngredients';
 import { motion } from 'framer-motion';
-
+import Scanner from '../components/Scanner';
 
 const CosmeticScan = () => {
   const [data, setData] = useState('Not Found');
@@ -14,65 +14,74 @@ const CosmeticScan = () => {
   const [result, setResult] = useState(null);
   const [productNotFound, setProductNotFound] = useState(false);
 
+  const handleScan = (barcode) => {
+    console.log("📦 Cosmetic Barcode:", barcode);
+    setData(barcode);
+    setSaved(false);
+  };
+
   useEffect(() => {
     const fetchAndSaveCosmetic = async () => {
       const user = auth.currentUser;
       if (!user || !data || saved || data === 'Not Found') return;
 
       try {
-        const res = await fetch(`https://world.openbeautyfacts.org/api/v2/product/${data}.json`);
-        const json = await res.json();
-        const product = json.product;
+        const res = await fetch(`https://makeup-api.herokuapp.com/api/v1/products.json`);
+        const products = await res.json();
+        const product = products.find(p =>
+          p.name?.toLowerCase().includes(data.toLowerCase()) ||
+          p.product_type?.toLowerCase().includes(data.toLowerCase())
+        );
 
-        if (!product || !product.ingredients_text) {
+        if (!product) {
           setProductNotFound(true);
           setSaved(true);
           return;
         }
 
-        const ingredients = product.ingredients_text
-          .split(/[,;]/)
-          .map((ing) => ing.trim())
-          .filter((ing) => ing.length > 0);
+        const ingredients = product.ingredients
+          ? product.ingredients.split(',').map((ing) => ing.trim()).filter((ing) => ing.length > 0)
+          : [];
 
-        const analysis = analyzeIngredients(ingredients);
+        const analysis = ingredients.length > 0 ? analyzeIngredients(ingredients) : { analysis: [] };
 
         const productInfo = {
-          name: product.product_name || "Unnamed Product",
-          brand: product.brands || "Unknown Brand",
+          name: product.name || "Unnamed Product",
+          brand: product.brand || "Unknown Brand",
+          image: product.image_link || null,
           ingredients,
-          usage: "Use as directed on packaging.",
-          skinType: ["all"],
-          benefits: ["Basic skincare"],
-          sideEffects: [],
           ...analysis,
+          score: 75,
+          usage: "Use as directed",
+          skinType: ["normal", "oily"],
+          sideEffects: [],
         };
 
         setResult(productInfo);
-        setImage(product.image_url || null);
-        setProductName(product.product_name || "Unnamed Product");
+        setImage(product.image_link || null);
+        setProductName(product.name || "Unnamed Product");
 
         const docRef = doc(db, 'cosmeticScans', `${user.uid}_${data}`);
         await setDoc(docRef, {
           barcode: data,
-          productName: product.product_name || "Unnamed Product",
-          brand: product.brands || "Unknown Brand",
-          imageUrl: product.image_url || null,
+          productName: productInfo.name,
+          brand: productInfo.brand,
+          imageUrl: productInfo.image,
           ingredients,
-          analysis,
+          analysis: productInfo.analysis,
           scannedAt: serverTimestamp(),
         });
 
         await addDoc(collection(db, 'cosmeticScanHistory'), {
           uid: user.uid,
-          productName: product.product_name || "Unnamed Product",
+          productName: productInfo.name,
           barcode: data,
-          image: product.image_url || null,
+          image: productInfo.image,
           timestamp: new Date(),
         });
 
         setSaved(true);
-        console.log("✅ Cosmetic saved:", product.product_name);
+        console.log("✅ Cosmetic saved:", productInfo.name);
       } catch (err) {
         console.error("❌ Cosmetic fetch error:", err);
         setProductNotFound(true);
@@ -88,14 +97,14 @@ const CosmeticScan = () => {
       <main className="flex-grow flex flex-col items-center justify-center px-6 py-12 text-center">
         <h1 className="text-3xl font-bold text-pink-600 mb-4">Scan a Cosmetic Product</h1>
         <p className="text-gray-600 mb-6">
-          Point your camera at a barcode to scan and analyze the product.
+          Point your camera at a barcode or type product name to analyze it.
         </p>
 
         {productNotFound && (
           <div className="mt-6 w-full max-w-md bg-red-100 text-red-800 border border-red-300 rounded-lg shadow-md p-5 text-left">
             <p className="font-semibold">⚠️ Product not available.</p>
             <p className="text-sm mt-2">
-              This barcode could not be found in our database. Please try scanning another item.
+              This product could not be found in the API. Try scanning or typing a different name.
             </p>
             <button
               onClick={() => {
@@ -115,15 +124,12 @@ const CosmeticScan = () => {
 
         {!productNotFound && !saved && (
           <div className="w-full max-w-md border rounded-md overflow-hidden shadow-md">
-            <BarcodeScannerComponent
-              width={500}
-              height={300}
-              onUpdate={(err, result) => {
-                if (result) {
-                  setData(result.text);
-                  setSaved(false);
-                }
+            <Scanner
+              onScan={(barcode) => {
+                setData(barcode);
+                setSaved(false);
               }}
+              borderColor="pink"
             />
           </div>
         )}

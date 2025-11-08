@@ -8,6 +8,7 @@ import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { motion } from "framer-motion";
 import { useLocation } from 'react-router-dom';
 import { isFoodBarcode } from '../utils/barcodeValidator';
+import Scanner from '../components/Scanner';
 
 
 
@@ -79,6 +80,7 @@ const FoodScan = ({ scanType }) => {
   // const params = new URLSearchParams(location.search);
   // const scanType = params.get('type'); // 'food' or 'cosmetics'
   const [warning, setWarning] = useState('');
+  
   
 
 
@@ -342,16 +344,14 @@ if (calories >= 400) {
   </div>
 ) : !saved ? (
   <div className="w-full max-w-md border rounded-md overflow-hidden shadow-md">
-    <BarcodeScannerComponent
-      width={500}
-      height={300}
-      onUpdate={(err, result) => {
-        if (result) {
-          setData(result.text);
-          setSaved(false);
-        }
-      }}
-    />
+   
+<Scanner
+  onScan={(barcode) => {
+    setData(barcode);
+    setSaved(false);
+  }}
+  borderColor="green"
+/>
   </div>
 ) : (
   <div className="mt-6 w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-md p-5 text-left">
