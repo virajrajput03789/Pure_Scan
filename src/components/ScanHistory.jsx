@@ -92,7 +92,9 @@ function ScanHistory() {
                 hidden: { opacity: 0, y: 10 },
                 visible: { opacity: 1, y: 0 }
               }}
-              className="border p-4 rounded shadow bg-white text-sm md:text-base"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="border p-4 rounded shadow bg-white text-sm md:text-base transition-all duration-300"
             >
               <p><strong>Product:</strong> {scan.productName}</p>
               <p><strong>Barcode:</strong> {scan.barcode}</p>
@@ -118,16 +120,18 @@ function ScanHistory() {
                   alt={scan.productName}
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
+                  whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.3 }}
                   className="w-24 mt-2 rounded"
                 />
               )}
-              <button
+              <motion.button
+                whileTap={{ scale: 0.95 }}
                 onClick={() => handleDelete(scan.id)}
                 className="mt-2 px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
               >
                 Delete
-              </button>
+              </motion.button>
             </motion.li>
           ))}
         </motion.ul>

@@ -39,7 +39,7 @@ function Profile() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="max-w-md mx-auto px-6 pt-6 pb-12" // ✅ updated padding for tighter top
+      className="max-w-md mx-auto px-6 pt-6 pb-12"
     >
       <div className="relative w-fit mx-auto mb-4">
         <motion.h2
@@ -61,8 +61,10 @@ function Profile() {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="bg-white shadow-md rounded p-4 space-y-4 text-sm md:text-base"
+        className="bg-white shadow-md rounded p-4 space-y-4 text-sm md:text-base transition-all"
       >
         {user.photoURL && (
           <motion.img
@@ -70,6 +72,7 @@ function Profile() {
             alt="Profile"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
+            whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.3 }}
             className="w-24 h-24 rounded-full mx-auto"
           />
@@ -86,11 +89,13 @@ function Profile() {
         transition={{ duration: 0.4, delay: 0.3 }}
         className="mt-6 space-y-2"
       >
-        <input
+        <motion.input
           type="text"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           placeholder="Enter new display name"
+          whileFocus={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
           className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
         />
         <motion.button
