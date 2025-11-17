@@ -6,6 +6,9 @@ const BackButton = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // ✅ Prevent render on Home page
+  if (location.pathname === "/") return null;
+
   const handleBack = () => {
     const blockedRoutes = ["/login", "/signin"];
     if (blockedRoutes.includes(location.pathname)) {

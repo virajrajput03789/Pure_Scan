@@ -29,7 +29,6 @@ function AppContent() {
   const location = useLocation();
 
   const showBackButtonOn = [
-    '/home',
     '/aboutUs',
     '/contactUs',
     '/select-scan',
