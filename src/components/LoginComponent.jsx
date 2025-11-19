@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  signInWithEmailAndPassword,
-  signInWithPopup
-} from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from './FireBase';
+import { motion } from 'framer-motion';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -36,50 +34,120 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white p-8 rounded shadow">
-        <h2 className="text-2xl font-bold text-green-700 mb-6 text-center">Login to Your Account</h2>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="flex items-center justify-center min-h-screen px-4"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        whileHover={{ scale: 1.005 }}
+        className="w-full max-w-md p-10 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-200 backdrop-blur-md bg-white/80 relative overflow-hidden"
+      >
+        {/* ✅ Gradient Heading + Underline */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="text-center space-y-2 mb-8"
+        >
+          <motion.h2
+            whileHover={{
+              scale: 1.05,
+              textShadow: "0px 0px 12px rgba(34,197,94,0.8)"
+            }}
+            className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-500 tracking-wide animate-pulse"
+          >
+            Log In
+          </motion.h2>
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.4 }}
+            className="h-1 bg-green-500 w-24 mx-auto rounded origin-left"
+          />
+        </motion.div>
 
-        <form className="space-y-4" onSubmit={handleLogin}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border px-4 py-2 rounded"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border px-4 py-2 rounded"
-          />
-          <button
+        {/* ✅ Form */}
+        <form className="space-y-6" onSubmit={handleLogin}>
+          {[email, password].map((_, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.2 }}
+              whileHover={{ scale: 1.01 }}
+              className="relative transition duration-300"
+            >
+              <motion.input
+                type={i === 0 ? 'email' : 'password'}
+                value={i === 0 ? email : password}
+                onChange={(e) => i === 0 ? setEmail(e.target.value) : setPassword(e.target.value)}
+                required
+                whileFocus={{ scale: 1.01 }}
+                className="peer w-full px-4 pt-6 pb-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 bg-white/90 backdrop-blur-sm"
+              />
+              <label className="absolute left-4 top-2 text-xs text-gray-500 peer-focus:text-green-600 peer-focus:top-1 transition-all">
+                {i === 0 ? 'Email address' : 'Password'}
+              </label>
+            </motion.div>
+          ))}
+
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            whileHover={{
+              scale: 1.05,
+              backgroundColor: "#059669",
+              boxShadow: "0px 4px 12px rgba(0,0,0,0.2)"
+            }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
             type="submit"
-            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+            className="w-full bg-green-600 text-white py-2.5 rounded-md font-medium hover:bg-green-700 shadow-md hover:shadow-lg transition-all duration-300"
           >
             Login
-          </button>
+          </motion.button>
         </form>
 
-        <div className="mt-6">
+        {/* ✅ Google Login */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          whileHover={{ scale: 1.01 }}
+          className="mt-6"
+        >
           <button
             onClick={handleGoogleLogin}
-            className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 transition"
+            className="w-full flex items-center justify-center gap-2 bg-gray-100 text-gray-800 py-2.5 rounded-md border border-gray-300 hover:bg-gray-200 transition-all duration-300"
           >
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
             Sign in with Google
           </button>
-        </div>
+        </motion.div>
 
-        <p className="text-sm text-center text-gray-600 mt-4">
+        {/* ✅ Sign Up Link */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+          whileHover={{ scale: 1.01 }}
+          className="text-sm text-center text-gray-600 mt-6"
+        >
           Don’t have an account?{' '}
-          <Link to="/signup" className="text-green-600 font-medium hover:underline">
-            Sign up
-          </Link>
-        </p>
-      </div>
-    </div>
+          <motion.span whileHover={{ x: 2 }} className="inline-block">
+            <Link to="/signin" className="text-green-700 font-medium hover:underline">
+              Sign up
+            </Link>
+          </motion.span>
+        </motion.p>
+      </motion.div>
+    </motion.div>
   );
 };
 

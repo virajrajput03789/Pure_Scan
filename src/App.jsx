@@ -5,7 +5,6 @@ import {
   Navigate,
   useLocation,
 } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
 
 import Header from "./pages/Header.jsx";
 import Footer from "./pages/Footer.jsx";
@@ -23,7 +22,7 @@ import { Toaster } from 'react-hot-toast';
 import Profile from './components/Profile.jsx';
 import ScanTypeSelector from './components/ScanTypeSelector.jsx';
 import BackButton from './pages/BackButton.jsx';
-import CosmeticScan from './components/CosmeticScan';
+import CosmeticScan from './components/CosmeticScan.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -44,74 +43,68 @@ function AppContent() {
   const shouldShowBackButton = showBackButtonOn.includes(location.pathname);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 overflow-x-hidden">
+    <div className="relative flex flex-col min-h-screen bg-white overflow-x-hidden">
       <Header />
-      {shouldShowBackButton && (
-        <div className="relative">
-          <BackButton />
-        </div>
-      )}
+      {shouldShowBackButton && <BackButton />}
 
       <main className="flex-grow pt-28 sm:pt-24 md:pt-32 lg:pt-36">
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<Home />} />
-            <Route path="/home" element={<Navigate to="/" />} />
-            <Route path="/aboutUs" element={<AboutUs />} />
-            <Route path="/contactUs" element={<ContactUs />} />
-            <Route
-              path="/select-scan"
-              element={
-                <PrivateRoute>
-                  <ScanTypeSelector />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/scan"
-              element={
-                <PrivateRoute>
-                  <Scan scanType="food" />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  <Dashboard />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/history"
-              element={
-                <PrivateRoute>
-                  <ScanHistory />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <PrivateRoute>
-                  <Profile />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/scan-cosmetics"
-              element={
-                <PrivateRoute>
-                  <CosmeticScan scanType="cosmetic" />
-                </PrivateRoute>
-              }
-            />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </AnimatePresence>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Navigate to="/" />} />
+          <Route path="/aboutUs" element={<AboutUs />} />
+          <Route path="/contactUs" element={<ContactUs />} />
+          <Route
+            path="/select-scan"
+            element={
+              <PrivateRoute>
+                <ScanTypeSelector />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/scan"
+            element={
+              <PrivateRoute>
+                <Scan scanType="food" />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/history"
+            element={
+              <PrivateRoute>
+                <ScanHistory />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/scan-cosmetics"
+            element={
+              <PrivateRoute>
+                <CosmeticScan scanType="cosmetic" />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
       </main>
 
       <Footer />

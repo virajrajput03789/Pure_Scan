@@ -23,7 +23,7 @@ const BackButton = () => {
       initial={{ x: -50, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 120, damping: 15 }}
-      className="absolute top-16 sm:top-24 md:top-28 lg:top-32 left-4 sm:left-10 md:left-20 z-10"
+      className="absolute top-28 sm:top-24 md:top-32 lg:top-36 left-6 sm:left-10 z-[9999]"
     >
       <motion.button
         onClick={handleBack}
