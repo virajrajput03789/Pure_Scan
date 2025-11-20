@@ -20,27 +20,23 @@ const BackButton = () => {
 
   return (
     <motion.div
-      initial={{ x: -50, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 120, damping: 15 }}
-      className="absolute top-28 sm:top-24 md:top-32 lg:top-36 left-6 sm:left-10 z-[9999]"
-    >
-      <motion.button
-        onClick={handleBack}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="inline-flex items-center gap-2 text-gray-600 hover:text-white bg-gray-200 hover:bg-green-600 px-4 py-2 rounded-full text-sm font-medium shadow-md transition-all duration-300"
-      >
-        <motion.span
-          whileHover={{ x: -2 }}
-          transition={{ type: "spring", stiffness: 300 }}
-          className="text-lg"
-        >
-          ←
-        </motion.span>
-        <span>Back</span>
-      </motion.button>
-    </motion.div>
+  initial={{ x: -50, opacity: 0 }}
+  animate={{ x: 0, opacity: 1 }}
+  transition={{ type: "spring", stiffness: 120, damping: 15 }}
+  className="w-full px-4 mt-4 flex"
+>
+  <motion.button
+    onClick={handleBack}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className="inline-flex items-center gap-2 text-gray-600 hover:text-white bg-gray-200 hover:bg-green-600
+      px-4 py-2 rounded-full text-sm sm:text-base font-medium shadow-md transition-all duration-300"
+  >
+    <span className="text-lg">←</span>
+    <span>Back</span>
+  </motion.button>
+</motion.div>
+
   );
 };
 

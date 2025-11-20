@@ -27,16 +27,43 @@ const Signup = () => {
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="flex items-center justify-center min-h-screen px-4"
+      className="flex items-center justify-center min-h-screen px-4 relative overflow-hidden"
     >
+
+      {/* 🌟 Floating Ambient Glow Lights */}
       <motion.div
-        whileHover={{ scale: 1.005 }}
-        transition={{ duration: 0.3 }}
+        className="absolute top-10 left-10 w-64 h-64 rounded-full bg-green-300/30 blur-3xl"
+        animate={{ y: [0, 20, 0], x: [0, -20, 0], opacity: [0.6, 1, 0.6] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute bottom-10 right-10 w-72 h-72 rounded-full bg-green-400/20 blur-3xl"
+        animate={{ y: [0, -25, 0], x: [0, 25, 0], opacity: [0.5, 0.8, 0.5] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      <motion.div
+        whileHover={{
+          scale: 1.01,
+          rotateX: 2,
+          rotateY: -3,
+          boxShadow: "0 12px 40px rgba(16,185,129,0.25)"
+        }}
+        transition={{ type: "spring", stiffness: 150, damping: 12 }}
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md p-10 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-200 backdrop-blur-md bg-white/80 relative overflow-hidden"
       >
-        {/* ✅ Gradient Heading + Green Underline */}
+
+        {/* 🟢 Animated Top Glow Line */}
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: "100%" }}
+          transition={{ duration: 1 }}
+          className="absolute top-0 left-0 h-[3px] bg-gradient-to-r from-green-400 to-teal-400"
+        />
+
+        {/* 🌈 Heading */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -45,22 +72,23 @@ const Signup = () => {
         >
           <motion.h2
             whileHover={{
-              scale: 1.05,
-              textShadow: "0px 0px 12px rgba(34,197,94,0.8)"
+              scale: 1.06,
+              textShadow: "0px 0px 16px rgba(34,197,94,0.8)"
             }}
             className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-500 tracking-wide animate-pulse"
           >
             Create an Account
           </motion.h2>
+
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.5 }}
             className="h-1 bg-green-500 w-24 mx-auto rounded origin-left"
           />
         </motion.div>
 
-        {/* ✅ Form */}
+        {/* ✨ Form */}
         <form className="space-y-6" onSubmit={handleSignup}>
           {[
             { value: name, set: setName, type: 'text', placeholder: 'Full Name' },
@@ -73,49 +101,68 @@ const Signup = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.2 }}
-              whileHover={{ scale: 1.01 }}
+              whileHover={{ scale: 1.02 }}
               className="relative transition duration-300"
             >
+              {/* Input */}
               <motion.input
                 type={field.type}
                 placeholder={field.placeholder}
                 value={field.value}
                 onChange={(e) => field.set(e.target.value)}
                 required
-                whileFocus={{ scale: 1.01 }}
+                whileFocus={{
+                  scale: 1.02,
+                  boxShadow: "0 0 8px rgba(16,185,129,0.35)"
+                }}
                 className="w-full px-4 pt-5 pb-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 bg-white/90 backdrop-blur-sm transition-all duration-300"
+              />
+
+              {/* Floating border highlight */}
+              <motion.div
+                initial={{ scaleX: 0 }}
+                whileFocus={{ scaleX: 1 }}
+                className="absolute bottom-0 left-0 w-full h-[2px] bg-green-500 origin-left"
               />
             </motion.div>
           ))}
 
+          {/* Button */}
           <motion.button
             type="submit"
             whileHover={{
-              scale: 1.05,
+              scale: 1.06,
               backgroundColor: "#059669",
-              boxShadow: "0px 4px 12px rgba(0,0,0,0.2)"
+              boxShadow: "0px 6px 20px rgba(34,197,94,0.35)"
             }}
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.94 }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="w-full bg-green-600 text-white py-2.5 rounded-md font-medium hover:bg-green-700 shadow-md hover:shadow-lg transition-all duration-300"
+            className="w-full bg-green-600 text-white py-2.5 rounded-md font-medium hover:bg-green-700 shadow-md hover:shadow-xl transition-all duration-300"
           >
             Sign Up
           </motion.button>
         </form>
 
-        {/* ✅ Login Link */}
+        {/* 🔗 Login Link */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          whileHover={{ scale: 1.01 }}
+          whileHover={{ scale: 1.02 }}
           className="text-sm text-center text-gray-600 mt-6"
         >
           Already have an account?{' '}
-          <motion.span whileHover={{ x: 2 }} className="inline-block">
-            <Link to="/login" className="text-green-700 font-medium hover:underline">
+          <motion.span
+            whileHover={{
+              x: 2,
+              color: "#059669",
+              textDecoration: "underline"
+            }}
+            className="inline-block"
+          >
+            <Link to="/login" className="text-green-700 font-medium">
               Log in
             </Link>
           </motion.span>

@@ -47,7 +47,8 @@ const Login = () => {
         whileHover={{ scale: 1.005 }}
         className="w-full max-w-md p-10 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-200 backdrop-blur-md bg-white/80 relative overflow-hidden"
       >
-        {/* ✅ Gradient Heading + Underline */}
+
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -71,7 +72,7 @@ const Login = () => {
           />
         </motion.div>
 
-        {/* ✅ Form */}
+        {/* FORM */}
         <form className="space-y-6" onSubmit={handleLogin}>
           {[email, password].map((_, i) => (
             <motion.div
@@ -83,20 +84,28 @@ const Login = () => {
               whileHover={{ scale: 1.01 }}
               className="relative transition duration-300"
             >
+
+              {/* FLOATING LABEL */}
+              <label className="absolute left-4 top-2 text-xs text-gray-500 peer-focus:text-green-600 peer-focus:top-1 transition-all pointer-events-none">
+                {i === 0 ? 'Email address' : 'Password'}
+              </label>
+
+              {/* INPUT FIELD FIXED + PLACEHOLDER */}
               <motion.input
                 type={i === 0 ? 'email' : 'password'}
+                placeholder={i === 0 ? "Enter your email" : "Enter your password"}  // ⭐ Added
                 value={i === 0 ? email : password}
                 onChange={(e) => i === 0 ? setEmail(e.target.value) : setPassword(e.target.value)}
                 required
-                whileFocus={{ scale: 1.01 }}
-                className="peer w-full px-4 pt-6 pb-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 bg-white/90 backdrop-blur-sm"
+                whileFocus={{ scale: 1.01, boxShadow: "0px 0px 10px rgba(34,197,94,0.4)" }}
+                className="peer w-full px-4 pt-6 pb-2 text-sm border border-gray-300 rounded-md 
+                focus:outline-none focus:ring-2 focus:ring-green-600 
+                bg-white/90 backdrop-blur-sm transition-all duration-300"
               />
-              <label className="absolute left-4 top-2 text-xs text-gray-500 peer-focus:text-green-600 peer-focus:top-1 transition-all">
-                {i === 0 ? 'Email address' : 'Password'}
-              </label>
             </motion.div>
           ))}
 
+          {/* Button */}
           <motion.button
             whileTap={{ scale: 0.95 }}
             whileHover={{
@@ -114,7 +123,7 @@ const Login = () => {
           </motion.button>
         </form>
 
-        {/* ✅ Google Login */}
+        {/* Google */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -131,7 +140,7 @@ const Login = () => {
           </button>
         </motion.div>
 
-        {/* ✅ Sign Up Link */}
+        {/* Signup Link */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -152,3 +161,4 @@ const Login = () => {
 };
 
 export default Login;
+
