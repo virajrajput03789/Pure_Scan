@@ -13,19 +13,49 @@ import {
 } from "firebase/firestore";
 import { motion } from "framer-motion";
 
-// ✅ GlowingCard with fog aura
-const GlowingCard = ({ children, glowColor = "#22c55e", className = "" }) => (
-  <div
-    className={`relative rounded-xl p-[2px] overflow-hidden ${className}`}
-    style={{
-      background: `linear-gradient(135deg, ${glowColor}55, transparent)`,
-      boxShadow: `0 0 12px ${glowColor}`,
-      borderRadius: "1rem",
-    }}
-  >
-    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm pointer-events-none z-0 transition duration-300 hover:opacity-100 opacity-0" />
-    <div className="relative z-10 rounded-xl bg-white/90 backdrop-blur">{children}</div>
+// 🔥 Home.jsx style floating particles
+const FloatingParticles = () => (
+  <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
+    {Array.from({ length: 25 }).map((_, i) => (
+      <motion.div
+        key={i}
+        className="absolute w-2 h-2 rounded-full bg-green-300/40 blur-sm"
+        initial={{
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          scale: Math.random() * 0.6 + 0.4,
+        }}
+        animate={{
+          y: ["0%", "-20%", "0%"],
+          x: ["0%", "10%", "-5%", "0%"],
+          opacity: [0.4, 1, 0.4],
+        }}
+        transition={{
+          duration: 8 + Math.random() * 10,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+    ))}
   </div>
+);
+
+// 🔥 Home.jsx style glowing card
+const GlowingCard = ({ children, glowColor = "#22c55e", className = "" }) => (
+  <motion.div
+    className={`relative rounded-2xl p-[2px] overflow-hidden ${className}`}
+    style={{
+      background: `linear-gradient(135deg, ${glowColor}60, transparent)`,
+      boxShadow: `0 0 15px ${glowColor}80`,
+    }}
+    whileHover={{ scale: 1.02 }}
+    transition={{ duration: 0.3 }}
+  >
+    <div className="absolute inset-0 bg-white/20 backdrop-blur-md rounded-2xl opacity-0 hover:opacity-100 transition-all duration-500" />
+    <div className="relative rounded-2xl bg-white/90 backdrop-blur-xl p-1 z-10">
+      {children}
+    </div>
+  </motion.div>
 );
 
 function ScanHistory() {
@@ -91,9 +121,8 @@ function ScanHistory() {
     try {
       await deleteDoc(doc(db, "scanHistory", scanId));
       setScans((prev) => prev.filter((scan) => scan.id !== scanId));
-      console.log("🗑️ Deleted scan:", scanId);
     } catch (err) {
-      console.error("❌ Delete failed:", err);
+      console.error("Delete failed:", err);
     }
   };
 
@@ -107,129 +136,156 @@ function ScanHistory() {
     );
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="p-4 max-w-screen-md mx-auto"
-    >
-      <div className="relative w-fit mx-auto mb-4">
-        <h2 className="text-xl md:text-2xl font-bold text-center text-green-700">
-          Your Scan History
-        </h2>
-        <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 0.4 }}
-          className="h-1 bg-green-500 w-full mt-1 rounded origin-left"
-        />
-      </div>
+    <div className="relative min-h-screen bg-gradient-to-br from-green-50 via-white to-green-100 overflow-hidden">
+      {/* 🔥 HOME.JSX style floating particles */}
+      <FloatingParticles />
 
-      {scans.length === 0 ? (
-        <div className="text-center text-gray-500">
-          <img src="/empty-box.svg" alt="No scans" className="w-32 mx-auto mb-2" />
-          <p>No scans found. Try scanning a product!</p>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative z-10 p-4 max-w-screen-md mx-auto"
+      >
+        {/* TITLE */}
+        <div className="relative w-fit mx-auto mb-6">
+          <motion.h2
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="text-3xl font-extrabold text-green-700 tracking-wide text-center"
+          >
+            Scan History
+          </motion.h2>
+
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.4 }}
+            className="h-1 bg-green-500 w-full mt-1 rounded origin-left shadow"
+          />
         </div>
-      ) : (
-        <motion.ul
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: {},
-            visible: {
-              transition: { staggerChildren: 0.1 },
-            },
-          }}
-          className="space-y-4"
-        >
-          {scans.map((scan, index) => (
-            <GlowingCard
-              glowColor={
-                scan.type === "cosmetic"
-                  ? "#ec4899"
-                  : scan.type === "food"
-                  ? "#22c55e"
-                  : "#9ca3af"
-              }
-              key={index}
-            >
-              <motion.li
-                initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.6, ease: "easeOut", bounce: 0.3 }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="p-4 rounded-xl text-sm md:text-base transition-all duration-300 space-y-2"
+
+        {/* EMPTY */}
+        {scans.length === 0 ? (
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="text-center text-gray-500"
+          >
+            <img src="/empty-box.svg" alt="No scans" className="w-32 mx-auto mb-2 opacity-80" />
+            <p>No scans found. Try scanning a product!</p>
+          </motion.div>
+        ) : (
+          <motion.ul
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.12 } },
+            }}
+            className="space-y-5"
+          >
+            {scans.map((scan, index) => (
+              <GlowingCard
+                glowColor={
+                  scan.type === "cosmetic"
+                    ? "#ec4899"
+                    : scan.type === "food"
+                    ? "#22c55e"
+                    : "#9ca3af"
+                }
+                key={index}
               >
-                <div className="flex justify-between items-center">
-                  <h3 className="font-bold text-gray-800 text-base md:text-lg">{scan.productName}</h3>
-                  <span className={`relative px-2 py-1 rounded text-white text-xs font-semibold z-10 ${
-                    scan.type === "cosmetic" ? "bg-pink-500" :
-                    scan.type === "food" ? "bg-green-500" : "bg-gray-400"
-                  }`}>
-                    {scan.type || "unknown"}
-                    <span className="absolute inset-0 rounded-full border border-white/30 animate-ping" />
-                  </span>
-                </div>
-
-                <div className="text-sm text-gray-600 space-y-1">
-                  <p><strong>Barcode:</strong> {scan.barcode}</p>
-                  {scan.nutritionScore && (
-                    <p>
-                      <strong>Nutrition Score:</strong>{" "}
-                      <span className="relative inline-block">
-                        <span
-                          className={`px-2 py-1 rounded text-white text-xs md:text-sm font-bold z-10 relative ${
-                            scan.nutritionScore?.value >= 80
-                              ? "bg-green-500"
-                              : scan.nutritionScore?.value >= 50
-                              ? "bg-yellow-500"
-                              : "bg-red-500"
-                          }`}
-                        >
-                          {scan.nutritionScore?.value} ({scan.nutritionScore?.grade})
-                        </span>
-                        <span
-                          className="absolute inset-0 rounded-full border-2 border-white/30 animate-ping"
-                          style={{ animationDuration: "2s" }}
-                        />
-                      </span>
-                    </p>
-                  )}
-                  <p className="text-xs text-gray-500">
-                    <strong>Scanned At:</strong>{" "}
-                    {scan.timestamp?.seconds
-                      ? new Date(scan.timestamp.seconds * 1000).toLocaleString()
-                      : "Unknown"}
-                  </p>
-                </div>
-
-                {scan.image && (
-                  <motion.img
-                    src={scan.image}
-                    alt={scan.productName}
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-24 mt-2 rounded shadow-sm ring-2 ring-transparent hover:ring-green-400"
-                  />
-                )}
-
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleDelete(scan.id)}
-                  className="mt-2 px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md relative overflow-hidden"
+                <motion.li
+                  variants={{
+                    hidden: { opacity: 0, y: 30, scale: 0.95 },
+                    visible: { opacity: 1, y: 0, scale: 1 },
+                  }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="p-4 rounded-xl text-sm md:text-base transition-all duration-300 space-y-2"
                 >
-                  Delete
-                  <span className="absolute inset-0 bg-red-700/10 animate-ping rounded pointer-events-none" />
-                </motion.button>
-              </motion.li>
-            </GlowingCard>
-          ))}
-        </motion.ul>
-      )}
-    </motion.div>
+                  {/* --- existing content untouched --- */}
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-bold text-gray-800 text-base md:text-lg">
+                      {scan.productName}
+                    </h3>
+
+                    <span
+                      className={`relative px-2 py-1 rounded text-white text-xs font-semibold z-10 ${
+                        scan.type === "cosmetic"
+                          ? "bg-pink-500"
+                          : scan.type === "food"
+                          ? "bg-green-500"
+                          : "bg-gray-400"
+                      }`}
+                    >
+                      {scan.type}
+                      <span className="absolute inset-0 rounded-full border border-white/30 animate-ping" />
+                    </span>
+                  </div>
+
+                  <div className="text-sm text-gray-600 space-y-1">
+                    <p>
+                      <strong>Barcode:</strong> {scan.barcode}
+                    </p>
+
+                    {scan.nutritionScore && (
+                      <p>
+                        <strong>Nutrition Score:</strong>{" "}
+                        <span className="relative inline-block">
+                          <span
+                            className={`px-2 py-1 rounded text-white text-xs md:text-sm font-bold z-10 relative ${
+                              scan.nutritionScore?.value >= 80
+                                ? "bg-green-500"
+                                : scan.nutritionScore?.value >= 50
+                                ? "bg-yellow-500"
+                                : "bg-red-500"
+                            }`}
+                          >
+                            {scan.nutritionScore?.value} ({scan.nutritionScore?.grade})
+                          </span>
+                          <span
+                            className="absolute inset-0 rounded-full border-2 border-white/30 animate-ping"
+                            style={{ animationDuration: "2s" }}
+                          />
+                        </span>
+                      </p>
+                    )}
+
+                    <p className="text-xs text-gray-500">
+                      <strong>Scanned At:</strong>{" "}
+                      {scan.timestamp?.seconds
+                        ? new Date(scan.timestamp.seconds * 1000).toLocaleString()
+                        : "Unknown"}
+                    </p>
+                  </div>
+
+                  {scan.image && (
+                    <motion.img
+                      src={scan.image}
+                      alt={scan.productName}
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-24 mt-2 rounded shadow-md ring-2 ring-transparent hover:ring-green-400"
+                    />
+                  )}
+
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleDelete(scan.id)}
+                    className="mt-2 px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md relative overflow-hidden"
+                  >
+                    Delete
+                    <span className="absolute inset-0 bg-red-700/10 animate-ping rounded pointer-events-none" />
+                  </motion.button>
+                </motion.li>
+              </GlowingCard>
+            ))}
+          </motion.ul>
+        )}
+      </motion.div>
+    </div>
   );
 }
 
