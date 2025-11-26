@@ -289,58 +289,70 @@ export default function Home() {
           </motion.div>
 
           {/* CTA Section */}
-          <motion.section
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="py-16 px-4 text-center max-w-4xl mx-auto mt-24"
-          >
-            <motion.h2
-              animate={{ y: [0, -8, 0], textShadow: ["0 0 0 rgba(0,0,0,0)", "0 12px 40px rgba(34,197,94,0.12)", "0 0 0 rgba(0,0,0,0)"] }}
-              transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-              className="font-heading text-3xl sm:text-4xl font-extrabold text-green-700 mb-8 underline underline-offset-8"
-            >
-              Join the Movement
-            </motion.h2>
+<motion.section
+  variants={fadeUp}
+  initial="hidden"
+  whileInView="visible"
+  viewport={{ once: true }}
+  transition={{ duration: 0.7 }}
+  className="py-16 px-4 text-center max-w-4xl mx-auto mt-24"
+>
+  <motion.h2
+    animate={{
+      y: [0, -8, 0],
+      textShadow: [
+        "0 0 0 rgba(0,0,0,0)",
+        "0 12px 40px rgba(34,197,94,0.12)",
+        "0 0 0 rgba(0,0,0,0)",
+      ],
+    }}
+    transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+    className="font-heading text-3xl sm:text-4xl font-extrabold text-green-700 mb-8 underline underline-offset-8"
+  >
+    Join the Movement
+  </motion.h2>
 
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.25 } } }}
-              className="space-y-6 text-gray-700 text-base leading-relaxed"
-            >
-              <motion.p variants={fadeUp} whileHover={{ scale: 1.02 }}>
-                Thousands are choosing smarter food habits every day. Be part of the change.
-              </motion.p>
-              <motion.p variants={fadeUp} whileHover={{ scale: 1.02 }}>
-                <span className="font-semibold text-green-600">PureScan</span> is more than a scanner — it's about <span className="text-emerald-600 font-semibold">transparency</span>, health, and <span className="text-emerald-600 font-semibold">empowerment</span>.
-              </motion.p>
-              <motion.p variants={fadeUp} whileHover={{ scale: 1.02 }}>
-                We believe in <span className="font-medium text-green-700">loyalty-driven design</span>, no ads, no compromises. Your data stays yours.
-              </motion.p>
-            </motion.div>
+  <motion.div
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true }}
+    variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.25 } } }}
+    className="space-y-6 text-gray-700 text-base leading-relaxed"
+  >
+    <motion.p variants={fadeUp} whileHover={{ scale: 1.02 }}>
+      Thousands are choosing smarter food habits every day. Be part of the change.
+      Discover how understanding your product labels can protect your health and well-being.
+    </motion.p>
+    <motion.p variants={fadeUp} whileHover={{ scale: 1.02 }}>
+      <span className="font-semibold text-green-600">PureScan</span> is more than a scanner — it's about <span className="text-emerald-600 font-semibold">transparency</span>, health, and <span className="text-emerald-600 font-semibold">empowerment</span>. Make informed decisions for yourself and your family.
+    </motion.p>
+    <motion.p variants={fadeUp} whileHover={{ scale: 1.02 }}>
+      We believe in <span className="font-medium text-green-700">loyalty-driven design</span>, no ads, no compromises. Your data stays yours. Join our growing community committed to safe, conscious consumption.
+    </motion.p>
+    <motion.p variants={fadeUp} whileHover={{ scale: 1.02 }}>
+      Start scanning today and take the first step towards a healthier lifestyle. Your journey to smarter choices begins here.
+    </motion.p>
+  </motion.div>
 
-            <motion.div whileTap={{ scale: 0.92 }} className="mt-10">
-              <motion.div whileHover={{ scale: 1.08, boxShadow: "0px 20px 60px rgba(34,197,94,0.28)" }} className="inline-block relative">
-                <Link
-                  to="/aboutUs"
-                  className="inline-block bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-600 transition-all shadow-md hover:shadow-xl relative overflow-hidden"
-                >
-                  <span className="relative z-10">Learn More</span>
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    whileHover={{ opacity: 0.26 }}
-                    transition={{ duration: 0.35 }}
-                    className="absolute inset-0 rounded-full pointer-events-none"
-                    style={{ background: "radial-gradient(circle at 50% 40%, rgba(255,255,255,0.12), transparent 40%)" }}
-                  />
-                </Link>
-              </motion.div>
-            </motion.div>
-          </motion.section>
+  <motion.div whileTap={{ scale: 0.92 }} className="mt-10">
+    <motion.div whileHover={{ scale: 1.08, boxShadow: "0px 20px 60px rgba(34,197,94,0.28)" }} className="inline-block relative">
+      <Link
+        to="/aboutUs"
+        className="inline-block bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-600 transition-all shadow-md hover:shadow-xl relative overflow-hidden"
+      >
+        <span className="relative z-10">Learn More</span>
+        <motion.span
+          initial={{ opacity: 0 }}
+          whileHover={{ opacity: 0.26 }}
+          transition={{ duration: 0.35 }}
+          className="absolute inset-0 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle at 50% 40%, rgba(255,255,255,0.12), transparent 40%)" }}
+        />
+      </Link>
+    </motion.div>
+  </motion.div>
+</motion.section>
+
         </motion.div>
       </div>
     </div>
